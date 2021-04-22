@@ -1,15 +1,15 @@
 # Defense-of-Ila
 
-#What is this? 🤔
+# 🤔 What is this? 
 
 
-#Why would we make it 🙄
+# 🙄 Why would we make it 
 
 
-#How could you play it? 😤
+# 😤 How could you play it? 
 
 
-#How did we make it works? 😎
+# 😎 How did we make it works? 
 
 
-#Frequently Ask Question
+# ⁉ Frequently Ask Question
