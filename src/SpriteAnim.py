@@ -17,9 +17,9 @@ class Animation:
 
         # list frame yang dapat dari spritesheet
         self.frames = []
-        spreadsheet_size = self.sheet.get_size()
+        spritesheet_size = self.sheet.get_size()
         # parsing frames dari spritesheet
-        self.frame_size = (spreadsheet_size[0] // kolom , spreadsheet_size[1] // baris)
+        self.frame_size = (spritesheet_size[0] // kolom , spritesheet_size[1] // baris)
         for j in range(baris):
             for i in range(kolom):
                 pos = (self.frame_size[0] * i, self.frame_size[1] * j)
