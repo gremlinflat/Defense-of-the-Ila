@@ -1,7 +1,14 @@
-import window_lib
+from game import *
 
-win = window_lib.Window((800, 600))
-game = window_lib.Game(win)
 
-game.game_loop()
-game.quit()
+win = Window((800, 600))
+game = Game(win) 
+
+def main():
+    game.game_loop()
+    game.quit()
+
+ 
+if __name__ == "__main__":
+    main()
+
