@@ -1,5 +1,5 @@
 import pygame
-from spriteAnim import *
+from SpriteAnim import *
 
 
 
