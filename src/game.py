@@ -1,6 +1,7 @@
 import pygame
 import os
 from ship import *
+from bg import Background
 
 #class layar
 class Window:
@@ -12,13 +13,12 @@ class Window:
         # membuat object layar dengan sebesar {besar_layar}
         self.layar = pygame.display.set_mode(besar_layar)
 
-
 class Game:
     def __init__(self, window):
         self.__dt = 0
         self.window = window
         self.ship = Ship((50, 50), 100, "ship.png", (100, 200), 5, 2)
-    
+        self.bg = Background()
 
     def game_loop(self):
         clock = pygame.time.Clock()
@@ -26,6 +26,7 @@ class Game:
             self.update()
             self.draw()
             self.__dt = self.delta_time(clock.tick(30))
+            
 
     def draw(self):
         self.window.layar.fill((0, 0, 0))
@@ -41,6 +42,8 @@ class Game:
                     pygame.quit()
         
         self.ship.update(self.__dt)
+        self.bg.update()
+        self.bg.render()
 
     # mendapatkan jarak waktu antara dua frame dalam satuan detik
     def delta_time(self, time_between):
