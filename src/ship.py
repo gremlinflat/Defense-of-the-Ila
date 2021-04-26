@@ -1,5 +1,5 @@
 import pygame
-from spriteAnim import *
+from SpriteAnim import *
 
 
 
@@ -13,7 +13,8 @@ KEY_DICT = {
 class Ship(pygame.sprite.Sprite):
     def __init__(self, pos, speed, img_name, size, kolom, baris):
         super().__init__()
-        self.animation = Animation(img_name, kolom, baris)
+        self.animation = Animation(img_name, kolom, baris, size)
+        #self.animation.scale(size)
         self.rect = pygame.Rect(pos, self.animation.frame_size)
 
         self.pos = list(self.rect.center)
@@ -24,12 +25,12 @@ class Ship(pygame.sprite.Sprite):
 
     def draw(self, window):
         # kondisi untuk menentukan frame mana yang akan di draw
-        if self.vec[0] > 0:
-            self.animation.set_target_frame(4)
-        elif self.vec[0] < 0:
-            self.animation.set_target_frame(0)
-        else:
-            self.animation.set_target_frame(2)
+        #if self.vec[0] > 0:
+        #    self.animation.set_target_frame(4)
+        #elif self.vec[0] < 0:
+        #    self.animation.set_target_frame(0)
+        #else:
+        #    self.animation.set_target_frame(2)
         self.animation.draw(window, self.rect.topleft)
 
     def update(self, dt):
