@@ -3,7 +3,7 @@ import os
 
 class Animation:
     
-    def __init__(self, img_name, kolom, baris):
+    def __init__(self, img_name, kolom, baris, scale_size):
         # ambil alamat directory (absolute)
         basepath = os.path.dirname(__file__)
 
@@ -24,21 +24,28 @@ class Animation:
             for i in range(kolom):
                 pos = (self.frame_size[0] * i, self.frame_size[1] * j)
                 frame = self.sheet.subsurface(pygame.Rect(pos, self.frame_size))
-                frame = pygame.transform.scale(frame, (32, 48))
+                frame = pygame.transform.scale(frame, scale_size)
                 self.frames.append(frame)
     
 
-    
+    def scale(self, size):
+        new_frames = []
+        for frame in self.frames:
+            new_frame = pygame.transform.scale(frame, size)
+            new_frames.append(new_frame)
+        self.frames = new_frames
     # ganti frame yang di draw menjadi frame selanjutnya
     def next(self):
         self.__current_frame = ((self.__current_frame + 1) % (len(self.frames) - 1))
     
     # set current drawn frame
     def set_current_frame(self, idx):
-        self.__current_frame = idx
+        if idx < len(self.frames):
+            self.__current_frame = idx
 
     def set_target_frame(self, idx):
-        self.__target_frame = idx
+        if idx < len(self.frames):
+            self.__target_frame = idx
     # draw frame di pojok kiri atas
     def draw(self, window):
         window.layar.blit(self.frames[self.__current_frame], (0,0))
