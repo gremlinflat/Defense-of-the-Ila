@@ -17,7 +17,7 @@ class Game:
     def __init__(self, window):
         self.__dt = 0
         self.window = window
-        self.ship = Ship((50, 50), 100, "pesawat 1.png", (500, 500), 1, 1)
+        self.ship = Ship((50, 50), 100, "ship.png", (64, 64), 5, 2)
         #self.bg = Background()
 
     def game_loop(self):
