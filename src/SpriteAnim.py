@@ -1,11 +1,11 @@
 import pygame
 import os
 
+basepath = os.path.dirname(__file__)
 class Animation:
     
     def __init__(self, img_name, kolom, baris, scale_size):
         # ambil alamat directory (absolute)
-        basepath = os.path.dirname(__file__)
 
         # ambil spritesheet dari folder assets
         self.sheet = pygame.image.load(os.path.join(basepath, os.pardir, "assets", img_name)).convert_alpha()
