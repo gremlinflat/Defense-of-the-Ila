@@ -1,6 +1,7 @@
 import pygame
 from Entity import Entity
 from SpriteAnim import *
+from assets import *
 
 
 
@@ -22,7 +23,7 @@ class Ship(Entity):
 
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0) 
-
+player = pygame.image.load("assets/pesawat 1.1.png")
     def draw(self, window):
         self.animations[self.selected_animation].draw(window, self.pos)
 
