@@ -15,6 +15,8 @@ class Animation:
 
         self.__target_frame = self.__current_frame
 
+        self.cooldown = 100
+        self.last = pygame.time.get_ticks()
         # list frame yang dapat dari spritesheet
         self.frames = []
         spritesheet_size = self.sheet.get_size()
@@ -52,11 +54,15 @@ class Animation:
 
     # draw frame di pos
     def draw(self, window, pos):
-        if self.__current_frame > self.__target_frame:
-            self.__current_frame -= 1
-        elif self.__current_frame < self.__target_frame:
-            self.__current_frame += 1
-            
+        #if self.__current_frame > self.__target_frame:
+        #    self.__current_frame -= 1
+        #elif self.__current_frame < self.__target_frame:
+        #    self.__current_frame += 1
+        now = pygame.time.get_ticks()
+        if now - self.last >= self.cooldown:
+            self.__current_frame = (self.__current_frame + 1) % len(self.frames)
+            self.last = now
+
         window.layar.blit(self.frames[self.__current_frame], pos)    
     
     
