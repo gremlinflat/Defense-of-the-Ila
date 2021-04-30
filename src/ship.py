@@ -1,5 +1,6 @@
 import pygame
 from SpriteAnim import *
+from assets import *
 
 
 
@@ -22,7 +23,7 @@ class Ship(pygame.sprite.Sprite):
 
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0) 
-
+player = pygame.image.load("assets/pesawat 1.1.png")
     def draw(self, window):
         # kondisi untuk menentukan frame mana yang akan di draw
         #if self.vec[0] > 0:
