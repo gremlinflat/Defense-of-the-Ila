@@ -1,22 +1,23 @@
 import pygame
 import os
 
-basepath = os.path.dirname(__file__)
+BASE_PATH = os.path.dirname(__file__)
+BASE_ASSET_PATH = os.path.join(BASE_PATH, os.pardir, "assets")
 
-
+DELAY_ANTARA_FRAME = 100
 class Animation:
     def __init__(self, img_name, kolom, baris, loop):
         # ambil alamat directory (absolute)
 
         # ambil spritesheet dari folder assets
-        self.sheet = pygame.image.load(os.path.join(basepath, os.pardir, "assets", img_name)).convert_alpha()
+        self.sheet = pygame.image.load(os.path.join(BASE_ASSET_PATH, img_name)).convert_alpha()
         
         # index frame yang sedang di draw
         self.__current_frame = 0
 
         self.loop = loop
 
-        self.cooldown = 100
+        self.cooldown = DELAY_ANTARA_FRAME
 
         self.last = pygame.time.get_ticks()
         # list frame yang dapat dari spritesheet
@@ -62,6 +63,10 @@ class Animation:
                 self.__current_frame = (self.__current_frame + 1)
                 self.last = now
 
-        window.layar.blit(self.frames[self.__current_frame], pos)    
+        window.layar.blit(self.frames[self.__current_frame], pos) 
+
+
+    def getcurFrame(self):
+        return self.__current_frame  
     
     

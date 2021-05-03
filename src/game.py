@@ -3,6 +3,7 @@ import os
 from ship import *
 #from bg import Background
 
+PARALLAX_BG_PATH_FROM_ASSET = "bg2.jpg"
 #class layar
 class Papan:
     def __init__(self, besar_layar): 
@@ -12,7 +13,7 @@ class Papan:
         self.tinggi = besar_layar[1]
         # membuat object layar dengan sebesar {besar_layar}
         self.layar = pygame.display.set_mode(besar_layar)
-        self.bgimage = pygame.image.load(os.path.join(basepath, os.pardir, "assets", "bg2.jpg"))
+        self.bgimage = pygame.image.load(os.path.join(BASE_ASSET_PATH, PARALLAX_BG_PATH_FROM_ASSET))
         self.rectBGimg = self.bgimage.get_rect()
  
         self.bgY1 = 0
@@ -39,7 +40,7 @@ class Game:
     def __init__(self, papan):
         self.__dt = 0
         self.papan = papan
-        self.ship = Ship((50, 100), 100, "ship_level1.png", 4, 5)
+        self.ship = Ship((50, 100), 100, 4, 1)
         #self.bg = Background()
 
     def game_loop(self):

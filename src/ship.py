@@ -11,10 +11,27 @@ KEY_DICT = {
     pygame.K_a : (-1, 0),
 }
 
+
+
+SHIP_ANIMATIONS_PATH = {
+    "idle" : "ship/ship_normal_level1.png",
+    "left" : "ship/ship_left_level1.png",
+    "right": "ship/ship_right_level1.png",
+    "sleft" : "ship/ship_sleft_level1.png",
+    "sright": "ship/ship_sright_level1.png",
+    
+}
 class Ship(Entity):
-    def __init__(self, pos, speed, img_name, kolom, baris):
+    def __init__(self, pos, speed, kolom, baris):
         super().__init__()
-        self._addAnimation(Animation(img_name, kolom, baris, True))
+        self._addAnimation([
+            
+            Animation(SHIP_ANIMATIONS_PATH["left"], 4, 1, True),
+            Animation(SHIP_ANIMATIONS_PATH["sleft"], 4, 1, True),
+            Animation(SHIP_ANIMATIONS_PATH["idle"], 4, 1, True),
+            Animation(SHIP_ANIMATIONS_PATH["sright"], 4, 1, True),
+            Animation(SHIP_ANIMATIONS_PATH["right"], 4, 1, True)
+        ])
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
 
         self.pos = list(self.rect.center)
@@ -23,8 +40,6 @@ class Ship(Entity):
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0) 
 
-    def draw(self, window):
-        self.animations[self.selected_animation].draw(window, self.pos)
 
     def update(self, dt):
         keys = pygame.key.get_pressed()
@@ -41,6 +56,13 @@ class Ship(Entity):
                 self.pos[1] += self.vec[1] * self.speed * dt
         if notPressed: # kondisi jika w, a, s, d tidak di tekan
             self.vec = (0, 0)
+        
+        if self.vec[0] > 0:
+            self._setnextAnim(4)
+        elif self.vec[0] < 0:
+            self._setnextAnim(0)
+        else:
+            self._setnextAnim(2)
         
         self.rect.center = tuple(self.pos)
 
