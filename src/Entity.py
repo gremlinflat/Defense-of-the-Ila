@@ -7,13 +7,13 @@ class Entity(pygame.sprite.Sprite):
         self.selected_animation = 0
         self.pos = [0,0]
         
-    def draw(self):
-        pass
+    def draw(self, window):
+        self.animations[self.selected_animation].draw(window, self.pos)
 
     def update(self):
         pass
     
-    def _addAnimation(self, Animation):
+    def _addAnimation(self, Animation, count):
         self.animations.append(Animation)
 
     def _setAnimation(self, idx):

@@ -12,7 +12,6 @@ class Papan:
         self.tinggi = besar_layar[1]
         # membuat object layar dengan sebesar {besar_layar}
         self.layar = pygame.display.set_mode(besar_layar)
-        
         self.bgimage = pygame.image.load(os.path.join(basepath, os.pardir, "assets", "bg2.jpg"))
         self.rectBGimg = self.bgimage.get_rect()
  
@@ -40,7 +39,7 @@ class Game:
     def __init__(self, papan):
         self.__dt = 0
         self.papan = papan
-        self.ship = Ship((50, 50), 100, "tes1.png", (50, 100), 4, 1)
+        self.ship = Ship((50, 100), 100, "ship_level1.png", 4, 5)
         #self.bg = Background()
 
     def game_loop(self):

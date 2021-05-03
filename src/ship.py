@@ -12,10 +12,10 @@ KEY_DICT = {
 }
 
 class Ship(Entity):
-    def __init__(self, pos, speed, img_name, size, kolom, baris):
+    def __init__(self, pos, speed, img_name, kolom, baris):
         super().__init__()
-        self._addAnimation(Animation(img_name, kolom, baris, size))
-        self.rect = pygame.Rect(pos, size)
+        self._addAnimation(Animation(img_name, kolom, baris, True))
+        self.rect = pygame.Rect(pos, self.animations[0].frame_size)
 
         self.pos = list(self.rect.center)
         self.speed = float(speed)
