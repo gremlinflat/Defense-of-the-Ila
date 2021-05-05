@@ -40,6 +40,7 @@ class Game:
     def __init__(self, papan):
         self.__dt = 0
         self.papan = papan
+
         self.ship = Ship((50, 50), 100, "tes1.png", (50, 100), 4, 1)
         #self.bg = Background()
 
