@@ -1,12 +1,12 @@
-from game import *
+from permainan import *
 
 
-win = Papan((800, 600))
-game = Game(win) 
+jendela_1 = Papan((800, 600))
+permainan = Permainan(jendela_1) 
 
 def main():
-    game.game_loop()
-    game.quit()
+    permainan.perulangan_permainan()
+    permainan.quit()
 
  
 if __name__ == "__main__":
