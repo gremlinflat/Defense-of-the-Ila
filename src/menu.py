@@ -149,7 +149,7 @@ def main():
 
     screen = pygame.display.set_mode((800, 600))
     surface_second = pygame.Surface((130,50))
-    layar = pygame.image.load("assets/menu logo clear.png")
+    layar = pygame.image.load("aset/menu logo clear.png")
     game_state = GameState.TITLE
 
     while True:
