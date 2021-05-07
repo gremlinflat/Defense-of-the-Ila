@@ -1,6 +1,7 @@
 import pygame
 from Entity import Entity
 from SpriteAnim import *
+from Bullet import *
 
 WIN_SIZE = (800, 600)
 
@@ -23,6 +24,8 @@ class Ship(Entity):
 
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0)
+        self.MAX_BULLET = 5
+        self.BULLET = []
 
     def draw(self, window):
         self.animations[self.selected_animation].draw(window, self.pos)
@@ -30,6 +33,7 @@ class Ship(Entity):
     def update(self, dt):
         keys = pygame.key.get_pressed()
         self.move(keys, dt)
+        self.shoot(keys, dt)
 
     # methon pergerakan pesawat
     def move(self, keys, dt):
@@ -46,3 +50,9 @@ class Ship(Entity):
             self.vec = (0, 0)
 
         self.rect.center = tuple(self.pos)
+
+    def shoot(self, keys, dt):
+        if keys[pygame.K_SPACE] and len(self.BULLET) <= self.MAX_BULLET:
+            bullet = pygame.Rect(self.pos[0], self.pos[1], 10, 5)
+            self.BULLET.append((bullet))
+        print(self.BULLET)
