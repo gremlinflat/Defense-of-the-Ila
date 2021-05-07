@@ -29,3 +29,7 @@ class Entity(pygame.sprite.Sprite):
     def _setAnimation(self, idx):
         self.selected_animation = idx
         self.next_animation = idx
+
+    def scale(self, size):
+        for an in self.animations:
+            an.scale(size)

@@ -35,6 +35,7 @@ class Animation:
     def scale(self, size):
         new_frames = []
         for frame in self.frames:
+            self.frame_size = size
             new_frame = pygame.transform.scale(frame, size)
             new_frames.append(new_frame)
         self.frames = new_frames

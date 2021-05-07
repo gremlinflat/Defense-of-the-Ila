@@ -25,7 +25,6 @@ class Ship(Entity):
     def __init__(self, pos, speed, kolom, baris):
         super().__init__()
         self._addAnimation([
-            
             Animation(SHIP_ANIMATIONS_PATH["left"], 4, 1, True),
             Animation(SHIP_ANIMATIONS_PATH["sleft"], 4, 1, True),
             Animation(SHIP_ANIMATIONS_PATH["idle"], 4, 1, True),
@@ -36,15 +35,18 @@ class Ship(Entity):
 
         self.pos = list(self.rect.center)
         self.speed = float(speed)
-
+        
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0) 
 
 
-    def update(self, dt):
+    def update(self, screen, dt):
         keys = pygame.key.get_pressed()
         self.move(keys, dt)
-        
+        self.pos[0] = min(max(self.pos[0], 0), screen.lebar - (self.rect.width))
+        self.pos[1] = min(max(self.pos[1], 0), screen.tinggi - (self.rect.height))
+        print(self.pos, self.rect.center)
+
     # methon pergerakan pesawat
     def move(self, keys, dt):
         notPressed = True
@@ -57,6 +59,9 @@ class Ship(Entity):
         if notPressed: # kondisi jika w, a, s, d tidak di tekan
             self.vec = (0, 0)
         
+        
+            
+        
         if self.vec[0] > 0:
             self._setnextAnim(4)
         elif self.vec[0] < 0:
@@ -65,5 +70,3 @@ class Ship(Entity):
             self._setnextAnim(2)
         
         self.rect.center = tuple(self.pos)
-
-        
