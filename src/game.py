@@ -39,6 +39,7 @@ class Papan:
         if self.bgY2 >= self.rectBGimg.height:
             self.bgY2 = -self.rectBGimg.height
 
+
     def draw(self):
         self.layar.blit(self.bgimage, (self.bgX2, self.bgY2))
         self.layar.blit(self.bgimage, (self.bgX1, self.bgY1))
