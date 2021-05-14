@@ -2,14 +2,15 @@ import pygame
 from Entity import Entity
 from SpriteAnim import *
 
-
+WIN_SIZE = (800, 600)
 
 KEY_DICT = {
-    pygame.K_w : (0, -1),
-    pygame.K_s : (0,  1),
-    pygame.K_d : (1,  0),
-    pygame.K_a : (-1, 0),
+    pygame.K_w: (0, -1),
+    pygame.K_s: (0,  1),
+    pygame.K_d: (1,  0),
+    pygame.K_a: (-1, 0),
 }
+
 
 
 
@@ -21,7 +22,6 @@ SHIP_ANIMATIONS_PATH = {
     "sright": "ship/ship_sright_level1.png",
     
 }
-
 
 class Ship(Entity):
     def __init__(self, pos, speed, kolom, baris):
@@ -46,6 +46,7 @@ class Ship(Entity):
     def update(self, screen, dt):
         keys = pygame.key.get_pressed()
         self.move(keys, dt)
+
         self.pos[0] = min(max(self.pos[0], 0), screen.lebar - (self.rect.width))
         self.pos[1] = min(max(self.pos[1], 0), screen.tinggi - (self.rect.height))
         print(self.pos, self.rect.center)
@@ -55,14 +56,17 @@ class Ship(Entity):
     # methon pergerakan pesawat
     def move(self, keys, dt):
         notPressed = True
-        for key in KEY_DICT: # untuk setiap key di KEY_DECT
-            if keys[key]: # kondisi jika w, a, s, d di tekan
+        for key in KEY_DICT:  # untuk setiap key di KEY_DECT
+            if keys[key]:  # kondisi jika w, a, s, d di tekan
                 notPressed = False
                 self.vec = KEY_DICT[key]
-                self.pos[0] += self.vec[0] * self.speed * dt
                 self.pos[1] += self.vec[1] * self.speed * dt
-        if notPressed: # kondisi jika w, a, s, d tidak di tekan
+                self.pos[1] %= WIN_SIZE[1]
+                self.pos[0] += self.vec[0] * self.speed * dt
+                self.pos[0] %= WIN_SIZE[0]
+        if notPressed:  # kondisi jika w, a, s, d tidak di tekan
             self.vec = (0, 0)
+
         
         
             
@@ -75,5 +79,3 @@ class Ship(Entity):
             self._setnextAnim(2)
         
         self.rect.center = tuple(self.pos)
-    
-    

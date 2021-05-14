@@ -20,7 +20,7 @@ class Bullet(Entity):
         self.pos[1] = self.pos[1] + (self.vec[1] * self.speed * dt)
         self.rect.center = tuple(self.pos)
 
-ASTEROID_PATH = "Meteor_05.png"
+ASTEROID_PATH = "meteor3.png"
 class Asteroid(Entity):
     def __init__(self, pos, scale):
         super().__init__()
