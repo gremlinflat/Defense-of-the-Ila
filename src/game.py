@@ -7,30 +7,34 @@ from pygame.sprite import Sprite
 from pygame.rect import Rect
 from enum import Enum
 
+
 PARALLAX_BG_PATH_FROM_ASSET = "bg2.jpg"
 MENU_IMAGE_PATH = "menu logo clear.png"
 CREDIT_IMAGE_PATH = "credit-pop up.jpg"
 MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
 #class layar
+
 class Papan:
-    def __init__(self, besar_layar): 
+    def __init__(self, besar_layar):
         # inisialisasi pygame
         pygame.init()
         self.lebar = besar_layar[0]
         self.tinggi = besar_layar[1]
         # membuat object layar dengan sebesar {besar_layar}
         self.layar = pygame.display.set_mode(besar_layar)
+
         self.bgimage = pygame.image.load(os.path.join(BASE_ASSET_PATH, PARALLAX_BG_PATH_FROM_ASSET))
+
         self.rectBGimg = self.bgimage.get_rect()
- 
+
         self.bgY1 = 0
         self.bgX1 = 0
- 
+
         self.bgY2 = -self.rectBGimg.height
         self.bgX2 = 0
- 
+
         self.gerak = 2
-         
+
     def update(self):
         self.bgY1 += self.gerak
         self.bgY2 += self.gerak
@@ -43,6 +47,7 @@ class Papan:
     def draw(self):
         self.layar.blit(self.bgimage, (self.bgX2, self.bgY2))
         self.layar.blit(self.bgimage, (self.bgX1, self.bgY1))
+
 
 class menu():
     def __init__(self,besar_layar, papan):
@@ -182,6 +187,7 @@ class Game:
     def __init__(self, papan):
         self.__dt = 0
         self.papan = papan
+
         self.ship = Ship((800, 600), 100, 4, 1)
         self.Asteroids = []
         self.last = pygame.time.get_ticks()
@@ -195,13 +201,16 @@ class Game:
         self.Menu=menu((self.papan.lebar,self.papan.tinggi), self.papan)
         self.game_state=GameState.TITLE
     
+
     def game_loop(self):
         clock = pygame.time.Clock()
         
         
         while True:
+
             if self.game_state == GameState.TITLE:     
                 self.game_state = self.Menu.title_screen()
+
 
             if self.game_state == GameState.NEWGAME:
                 self.update()
@@ -218,6 +227,7 @@ class Game:
     
     def draw(self):
         self.papan.draw()
+
         if self.ship != None:
             self.ship.draw(self.papan)
 
@@ -225,6 +235,7 @@ class Game:
             Asteorid.draw(self.papan)
         
         self.return_btn.draw(self.papan.layar)
+
         pygame.display.flip()
 
     def update(self):
@@ -234,6 +245,7 @@ class Game:
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
+
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_up = True
         self.Menu.ui_action = self.return_btn.update(pygame.mouse.get_pos(), mouse_up)
@@ -258,9 +270,12 @@ class Game:
 
         
 
+
     # mendapatkan jarak waktu antara dua frame dalam satuan detik
+
     def delta_time(self, time_between):
         return time_between / 1000.0
+
     
     def spawn_asteroid(self):
         rand_scale = random.randint(50, 100)
