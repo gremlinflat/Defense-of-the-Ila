@@ -183,12 +183,13 @@ def create_surface_with_text(text, font_size, text_rgb):
 
 SPAWN_COOLDOWN = 1000
 
+
 class Game:
     def __init__(self, papan):
         self.__dt = 0
         self.papan = papan
 
-        self.ship = Ship((800, 600), 100, 4, 1)
+        self.ship = None
         self.Asteroids = []
         self.last = pygame.time.get_ticks()
         self.return_btn = Write(
@@ -213,9 +214,7 @@ class Game:
 
 
             if self.game_state == GameState.NEWGAME:
-                self.update()
-                self.draw()
-                self.__dt = self.delta_time(clock.tick(30))
+                self.game_state = self.start_game(clock)
 
             if self.game_state == GameState.credit:
                 self.game_state = self.Menu.credit_screen()
@@ -239,18 +238,7 @@ class Game:
         pygame.display.flip()
 
     def update(self):
-        mouse_up = False
-            
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.QUIT:
-                pygame.quit()
-
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                mouse_up = True
-        self.Menu.ui_action = self.return_btn.update(pygame.mouse.get_pos(), mouse_up)
-        if self.Menu.ui_action is not None:
-            self.game_state = self.Menu.title_screen()
+        
 
         for As in self.Asteroids:
             if pygame.sprite.collide_rect(As, self.ship):
@@ -283,3 +271,24 @@ class Game:
         x = random.randint(0, self.papan.lebar - rand_scale)
         new_asteroid = Asteroid([x, y], (rand_scale, rand_scale))
         self.Asteroids.append(new_asteroid)
+
+    def start_game(self, clock):
+        self.ship = Ship((800, 600), 100, 4, 1)
+        self.Asteroids = []
+        while True:
+            self.update()
+            mouse_up = False
+            
+            events = pygame.event.get()
+            for event in events:
+
+                if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                    mouse_up = True
+            self.Menu.ui_action = self.return_btn.update(pygame.mouse.get_pos(), mouse_up)
+            if self.Menu.ui_action:
+                return GameState.TITLE
+
+            self.draw()
+            self.__dt = self.delta_time(clock.tick(30))
+
+

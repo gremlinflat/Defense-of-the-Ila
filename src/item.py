@@ -7,7 +7,7 @@ class Bullet():
     def __init__(self):
         pass
 
-ASTEROID_PATH = "Meteor_05.png"
+ASTEROID_PATH = "meteor3.png"
 class Asteroid(Entity):
     def __init__(self, pos, scale):
         super().__init__()

@@ -7,7 +7,6 @@ game = Game(win)
 
 def main():
     game.game_loop()
-    game.quit()
 
  
 if __name__ == "__main__":
