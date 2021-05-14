@@ -8,6 +8,9 @@ from pygame.rect import Rect
 from enum import Enum
 
 PARALLAX_BG_PATH_FROM_ASSET = "bg2.jpg"
+MENU_IMAGE_PATH = "menu logo clear.png"
+CREDIT_IMAGE_PATH = "credit-pop up.jpg"
+MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
 #class layar
 class Papan:
     def __init__(self, besar_layar): 
@@ -40,11 +43,11 @@ class Papan:
         self.layar.blit(self.bgimage, (self.bgX2, self.bgY2))
         self.layar.blit(self.bgimage, (self.bgX1, self.bgY1))
 
-class menu(Papan):
-    def __init__(self,besar_layar):
-        self.gambar=pygame.image.load("menu logo clear.png")
-        self.credit_image=pygame.image.load("credit-pop up.jpg")
-        Papan.__init__(self, besar_layar)
+class menu():
+    def __init__(self,besar_layar, papan):
+        self.gambar=pygame.image.load(os.path.join(BASE_ASSET_PATH, MENU_IMAGE_PATH))
+        self.credit_image=pygame.image.load(os.path.join(BASE_ASSET_PATH, CREDIT_IMAGE_PATH))
+        self.papan = papan
 
         self.start_btn = Write(
             center_position=(395, 325),
@@ -80,19 +83,18 @@ class menu(Papan):
 
     def title_screen(self):
         self.buttons = [self.start_btn,self.credit_btn, self.quit_btn]
-
         while True:
             mouse_up = False
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                     mouse_up = True
-                self.layar.blit(self.gambar,(0,0))
+            self.papan.layar.blit(self.gambar,(0,0))
 
             for button in self.buttons:
                 self.ui_action = button.update(pygame.mouse.get_pos(), mouse_up)
                 if self.ui_action is not None:
                     return self.ui_action
-                button.draw(self.layar)
+                button.draw(self.papan.layar)
 
             pygame.display.flip()
     
@@ -102,12 +104,13 @@ class menu(Papan):
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                     mouse_up = True
-            self.layar.blit(self.credit_image,(0,0))
+            self.papan.layar.blit(self.credit_image,(0,0))
 
             self.ui_action = self.return_btn.update(pygame.mouse.get_pos(), mouse_up)
             if self.ui_action is not None:
                 return self.ui_action
-            self.return_btn.draw(self.layar)
+            
+            self.return_btn.draw(self.papan.layar)
 
             pygame.display.flip()
 
@@ -167,7 +170,7 @@ class GameState(Enum):
 
 def create_surface_with_text(text, font_size, text_rgb):
     """ Returns surface with text written on """
-    font = pygame.font.Font("D:\Vermin Vibes 1989.ttf", int(font_size))
+    font = pygame.font.Font(os.path.join(BASE_ASSET_PATH, MENU_FONT_PATH), int(font_size))
     surface= font.render(text,True,text_rgb)
     return surface.convert_alpha()
 
@@ -181,49 +184,37 @@ class Game:
         self.ship = Ship((800, 600), 100, 4, 1)
         self.Asteroids = []
         self.last = pygame.time.get_ticks()
-        
-
-    def game_loop(self):
-        clock = pygame.time.Clock()
-        game_state=GameState.TITLE
-        Menu=menu((self.papan.lebar,self.papan.tinggi))
-        while True:
-            if game_state == GameState.TITLE:     
-                game_state = Menu.title_screen()
-
-            if game_state == GameState.NEWGAME:
-                return_btn = Write(
+        self.return_btn = Write(
                 center_position=(140, 570),
                 font_size=15,
                 text_rgb=(255,255,255),
                 text="Return to main menu",
                 action=GameState.TITLE,
-                )
+        )
+        self.Menu=menu((self.papan.lebar,self.papan.tinggi), self.papan)
+        self.game_state=GameState.TITLE
+    
+    def game_loop(self):
+        clock = pygame.time.Clock()
+        
+        
+        while True:
+            if self.game_state == GameState.TITLE:     
+                self.game_state = self.Menu.title_screen()
 
-                mouse_up = False
-                for event in pygame.event.get():
-                    if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                        mouse_up = True
-                Menu.layar.blit(Menu.bgimage,(0,0))            
+            if self.game_state == GameState.NEWGAME:
                 self.update()
                 self.draw()
                 self.__dt = self.delta_time(clock.tick(30))
 
-                Menu.ui_action = return_btn.update(pygame.mouse.get_pos(), mouse_up)
-                if Menu.ui_action is not None:
-                    game_state = Menu.title_screen()
-                return_btn.draw(Menu.layar)
+            if self.game_state == GameState.credit:
+                self.game_state = self.Menu.credit_screen()
 
-                pygame.display.flip()
-
-            if game_state == GameState.credit:
-                game_state = Menu.credit_screen()
-
-            if game_state == GameState.QUIT:
+            if self.game_state == GameState.QUIT:
                 pygame.quit()
                 return
 
-
+    
     def draw(self):
         self.papan.draw()
         if self.ship != None:
@@ -231,14 +222,23 @@ class Game:
 
         for Asteorid in self.Asteroids:
             Asteorid.draw(self.papan)
+        
+        self.return_btn.draw(self.papan.layar)
         pygame.display.flip()
 
     def update(self):
+        mouse_up = False
+            
         events = pygame.event.get()
         for event in events:
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-        
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                mouse_up = True
+        self.Menu.ui_action = self.return_btn.update(pygame.mouse.get_pos(), mouse_up)
+        if self.Menu.ui_action is not None:
+            self.game_state = self.Menu.title_screen()
+
         for As in self.Asteroids:
             if pygame.sprite.collide_rect(As, self.ship):
                 self.Asteroids.remove(As)
