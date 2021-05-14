@@ -182,8 +182,7 @@ def create_surface_with_text(text, font_size, text_rgb):
 
 
 SPAWN_COOLDOWN = 1000
-
-
+SHOOT_COOLDOWN = 1000
 class Game:
     def __init__(self, papan):
         self.__dt = 0
@@ -191,7 +190,8 @@ class Game:
 
         self.ship = None
         self.Asteroids = []
-        self.last = pygame.time.get_ticks()
+        self.last_spawn = pygame.time.get_ticks()
+        self.last_shoot = pygame.time.get_ticks()
         self.return_btn = Write(
                 center_position=(140, 570),
                 font_size=15,
@@ -201,7 +201,8 @@ class Game:
         )
         self.Menu=menu((self.papan.lebar,self.papan.tinggi), self.papan)
         self.game_state=GameState.TITLE
-        self.bul = Bullet([100, 100])
+        self.bullets = []
+        self.mouse_up = False
 
     def game_loop(self):
         clock = pygame.time.Clock()
@@ -211,7 +212,6 @@ class Game:
 
             if self.game_state == GameState.TITLE:     
                 self.game_state = self.Menu.title_screen()
-
 
             if self.game_state == GameState.NEWGAME:
                 self.game_state = self.start_game(clock)
@@ -232,7 +232,9 @@ class Game:
 
         for Asteorid in self.Asteroids:
             Asteorid.draw(self.papan)
-        self.bul.draw(self.papan)
+        
+        for bullet in self.bullets:
+            bullet.draw(self.papan)
         #self.bg.render()
         
         self.return_btn.draw(self.papan.layar)
@@ -240,26 +242,46 @@ class Game:
         pygame.display.flip()
 
     def update(self):
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                self.mouse_up = True
         
-
-        for As in self.Asteroids:
-            if pygame.sprite.collide_rect(As, self.ship):
-                self.Asteroids.remove(As)
-
-            As.update(self.__dt)
+        now = pygame.time.get_ticks()
+        if (now - self.last_spawn) >= SPAWN_COOLDOWN:
+            self.spawn_asteroid()
+            self.last_spawn = now
+            
         
+        if keys[pygame.K_SPACE] and (now - self.last_shoot) >= SHOOT_COOLDOWN:
+            self.shoot()
+            self.last_shoot = now
+        
+        self.Menu.ui_action = self.return_btn.update(pygame.mouse.get_pos(), self.mouse_up)
+        for Asteroid in self.Asteroids:
+            if pygame.sprite.collide_rect(Asteroid, self.ship):
+                ## REDUCE HEALTH
+                self.Asteroids.remove(Asteroid)
+            Asteroid.update(self.__dt)
+        
+        for bullet in self.bullets:
+            for Asteroid in self.Asteroids:
+                if pygame.sprite.collide_rect(bullet, Asteroid):
+                    self.Asteroids.remove(Asteroid)
+                    self.bullets.remove(bullet)
+            
+            if bullet.pos[1] < 0:
+                self.bullets.remove(bullet)
+                continue
+            
+            bullet.update(self.__dt)
+
         if self.ship != None: 
             self.ship.update(self.papan ,self.__dt)
         
         self.papan.update()
-        self.bul.update(self.__dt)
-        now = pygame.time.get_ticks()
-        if (now - self.last) >= SPAWN_COOLDOWN:
-            self.spawn_asteroid()
-            self.last = now
-
         
-
 
     # mendapatkan jarak waktu antara dua frame dalam satuan detik
 
@@ -274,23 +296,25 @@ class Game:
         new_asteroid = Asteroid([x, y], (rand_scale, rand_scale))
         self.Asteroids.append(new_asteroid)
 
+    def shoot(self):
+        x = self.ship.rect.topleft[0] + (self.ship.rect.width/2) - (BULLET_SCALE[0]/2) -2
+        y = self.ship.rect.topleft[1] - (BULLET_SCALE[1]/2)
+        new_bullet = Bullet([x, y])
+        self.bullets.append(new_bullet)
+         
+        print(self.ship.rect.center)
+
     def start_game(self, clock):
         self.ship = Ship((800, 600), 100, 4, 1)
         self.Asteroids = []
         while True:
-            self.update()
-            mouse_up = False
             
-            events = pygame.event.get()
-            for event in events:
-
-                if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                    mouse_up = True
-            self.Menu.ui_action = self.return_btn.update(pygame.mouse.get_pos(), mouse_up)
+            self.mouse_up = False
+            
+            self.update()
+            
             if self.Menu.ui_action:
                 return GameState.TITLE
-
+            
             self.draw()
             self.__dt = self.delta_time(clock.tick(30))
-
-

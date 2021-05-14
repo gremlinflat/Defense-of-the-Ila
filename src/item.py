@@ -11,7 +11,7 @@ class Bullet(Entity):
         self.pos = pos
         self._addAnimation(Animation(BULLET_PATH, 1, 1, False))
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
-        self.speed = 50
+        self.speed = 200
         self.vec = [0, -1]
         self.scale(BULLET_SCALE)
 
@@ -28,8 +28,9 @@ class Asteroid(Entity):
         self._addAnimation(Animation(ASTEROID_PATH, 1, 1, False))
         self.scale(scale)
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
-        self.speed = 50
-        self.vec = [random.uniform(-0.5, 0.5), 1]
+        self.speed = random.randint(100, 300)
+        x = random.uniform(0.1, 0.5) if self.pos[0] < 400 else random.uniform(-0.5, -0.1)
+        self.vec = [x, 1]
         
         
     

@@ -49,7 +49,7 @@ class Ship(Entity):
 
         self.pos[0] = min(max(self.pos[0], 0), screen.lebar - (self.rect.width))
         self.pos[1] = min(max(self.pos[1], 0), screen.tinggi - (self.rect.height))
-        print(self.pos, self.rect.center)
+        
 
         ##IMPLEMENT SHOOTING
 
@@ -78,4 +78,4 @@ class Ship(Entity):
         else:
             self._setnextAnim(2)
         
-        self.rect.center = tuple(self.pos)
+        self.rect.topleft = tuple(self.pos)
