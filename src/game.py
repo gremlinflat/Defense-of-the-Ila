@@ -64,6 +64,7 @@ class Game:
 
         for Asteorid in self.Asteroids:
             Asteorid.draw(self.papan)
+        self.bul.draw(self.papan)
         #self.bg.render()
         pygame.display.flip()
 
@@ -83,7 +84,7 @@ class Game:
             self.ship.update(self.papan ,self.__dt)
         
         self.papan.update()
-        
+        self.bul.update(self.__dt)
         now = pygame.time.get_ticks()
         if (now - self.last) >= SPAWN_COOLDOWN:
             self.spawn_asteroid()

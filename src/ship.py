@@ -21,6 +21,8 @@ SHIP_ANIMATIONS_PATH = {
     "sright": "ship/ship_sright_level1.png",
     
 }
+
+
 class Ship(Entity):
     def __init__(self, pos, speed, kolom, baris):
         super().__init__()
@@ -37,7 +39,8 @@ class Ship(Entity):
         self.speed = float(speed)
         
         # (vec[0], vec[1]) == (x, y)
-        self.vec = (0.0, 0.0) 
+        self.vec = (0.0, 0.0)
+        self.bullet_list = [] 
 
 
     def update(self, screen, dt):
@@ -46,6 +49,8 @@ class Ship(Entity):
         self.pos[0] = min(max(self.pos[0], 0), screen.lebar - (self.rect.width))
         self.pos[1] = min(max(self.pos[1], 0), screen.tinggi - (self.rect.height))
         print(self.pos, self.rect.center)
+
+        ##IMPLEMENT SHOOTING
 
     # methon pergerakan pesawat
     def move(self, keys, dt):
@@ -70,3 +75,5 @@ class Ship(Entity):
             self._setnextAnim(2)
         
         self.rect.center = tuple(self.pos)
+    
+    
