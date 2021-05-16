@@ -1,7 +1,7 @@
 import pygame
 from Entity import Entity
 from SpriteAnim import Animation
-import random
+from random import uniform, randint
 
 BULLET_PATH = "bullet.png"
 BULLET_SCALE = (10, 20)
@@ -21,6 +21,8 @@ class Bullet(Entity):
         self.rect.center = tuple(self.pos)
 
 ASTEROID_PATH = "meteor3.png"
+BONUS_PATH = "rocket bonus.png"
+
 class Asteroid(Entity):
     def __init__(self, pos, scale):
         super().__init__()
@@ -28,8 +30,8 @@ class Asteroid(Entity):
         self._addAnimation(Animation(ASTEROID_PATH, 1, 1, False))
         self.scale(scale)
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
-        self.speed = random.randint(100, 300)
-        x = random.uniform(0.1, 0.5) if self.pos[0] < 400 else random.uniform(-0.5, -0.1)
+        self.speed = randint(100, 300)
+        x = uniform(0.1, 0.5) if self.pos[0] < 400 else uniform(-0.5, -0.1)
         self.vec = [x, 1]
         
         
@@ -37,13 +39,23 @@ class Asteroid(Entity):
     def update(self, dt):
         self.pos[0] = self.pos[0] + (self.vec[0] * self.speed * dt)
         self.pos[1] = self.pos[1] + (self.vec[1] * self.speed * dt)
-        self.rect.center = tuple(self.pos)
+        self.rect.topleft = tuple(self.pos)
 
-    def collision(self, ship):
-        #print(ship.rect)
-        if pygame.sprite.collide_rect(self, ship):
-            print('destroy')
-            
+BONUS_SCALE = (30, 30)
 
+class Bonus(Entity):
+    def __init__(self, pos):
+        super().__init__()
+        self.pos = pos
+        self._addAnimation(Animation(BONUS_PATH, 1, 1, False))
+        self.scale(BONUS_SCALE)
+        self.rect = pygame.Rect(pos, self.animations[0].frame_size)
+        self.speed = 60
+        x = uniform(-0.5, 0.5)
+        self.vec = [x, 1]
 
+    def update(self, dt):
+        self.pos[0] = self.pos[0] + (self.vec[0] * self.speed * dt)
+        self.pos[1] = self.pos[1] + (self.vec[1] * self.speed * dt)
+        self.rect.topleft = tuple(self.pos)
     
