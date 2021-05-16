@@ -6,7 +6,7 @@ BASE_ASSET_PATH = os.path.join(BASE_PATH, os.pardir, "assets")
 
 DELAY_ANTARA_FRAME = 100
 class Animation:
-    def __init__(self, img_name, kolom, baris, loop):
+    def __init__(self, img_name, kolom, loop):
         # ambil alamat directory (absolute)
 
         # ambil spritesheet dari folder assets
@@ -24,12 +24,11 @@ class Animation:
         self.frames = []
         spritesheet_size = self.sheet.get_size()
         # parsing frames dari spritesheet
-        self.frame_size = (spritesheet_size[0] // kolom , spritesheet_size[1] // baris)
-        for j in range(baris):
-            for i in range(kolom):
-                pos = (self.frame_size[0] * i, self.frame_size[1] * j)
-                frame = self.sheet.subsurface(pygame.Rect(pos, self.frame_size))
-                self.frames.append(frame)
+        self.frame_size = (spritesheet_size[0] // kolom , spritesheet_size[1])
+        for i in range(kolom):
+            pos = (self.frame_size[0] * i, 0)
+            frame = self.sheet.subsurface(pygame.Rect(pos, self.frame_size))
+            self.frames.append(frame)
     
 
     def scale(self, size):

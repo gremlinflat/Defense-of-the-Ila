@@ -1,17 +1,19 @@
 import pygame
 import os
-from ship import Ship, BASE_ASSET_PATH, BASE_PATH
-from item import Bonus, Asteroid, Bullet, BULLET_SCALE
+from ship import Ship
+from item import Bonus, Asteroid, Bullet, BULLET_SCALE, Heart
 from random import randint
 import pygame.freetype
 from pygame.sprite import Sprite
 from pygame.rect import Rect
 from enum import Enum
+from SpriteAnim import BASE_ASSET_PATH, BASE_PATH
 
 
 PARALLAX_BG_PATH_FROM_ASSET = "bg2.jpg"
 MENU_IMAGE_PATH = "menu logo clear.png"
 CREDIT_IMAGE_PATH = "credit-pop up.jpg"
+HEALTH_IMAGE_PATH = "health-bar 1.png"
 MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
 SCORE_FONT_PATH = "Minecraft.ttf"
 #class layar
@@ -209,16 +211,21 @@ class Game:
         self.game_state=GameState.TITLE
         #self.mouse_up = False
         self.score = 0
+        self.heart = Heart()
+
+
+
     
     def show_score(self, papan):
         font = pygame.font.Font(os.path.join(BASE_ASSET_PATH, SCORE_FONT_PATH), SCORE_FONT_SIZE)
         score_txt = font.render(f"Score : {self.score}", True, (255, 255, 255))
-        self.papan.layar.blit(score_txt, (0, 0))
+        self.papan.layar.blit(score_txt, (0, self.heart.rect.width))
 
     def show_health(self, papan, health):
-        font = pygame.font.Font(os.path.join(BASE_ASSET_PATH, SCORE_FONT_PATH), SCORE_FONT_SIZE)
-        health_txt = font.render(f"Health : {health}", True, (255, 255, 255))
-        self.papan.layar.blit(health_txt, (0, 40))
+        x = 0
+        for i in range(health):
+            self.heart.draw_pos(self.papan, (x, 0))
+            x += self.heart.rect.width
 
 
     def game_loop(self):
@@ -331,6 +338,7 @@ class Game:
         
         self.papan.update()
         
+
 
     # mendapatkan jarak waktu antara dua frame dalam satuan detik
 

@@ -9,7 +9,7 @@ class Bullet(Entity):
     def __init__(self, pos):
         super().__init__()
         self.pos = pos
-        self._addAnimation(Animation(BULLET_PATH, 1, 1, False))
+        self._addAnimation(Animation(BULLET_PATH, 1, False))
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
         self.speed = 200
         self.vec = [0, -1]
@@ -22,12 +22,13 @@ class Bullet(Entity):
 
 ASTEROID_PATH = "meteor3.png"
 BONUS_PATH = "rocket bonus.png"
+HEART_PATH = "health-bar 1.png"
 
 class Asteroid(Entity):
     def __init__(self, pos, scale):
         super().__init__()
         self.pos = pos
-        self._addAnimation(Animation(ASTEROID_PATH, 1, 1, False))
+        self._addAnimation(Animation(ASTEROID_PATH, 1, False))
         self.scale(scale)
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
         self.speed = randint(100, 300)
@@ -47,7 +48,7 @@ class Bonus(Entity):
     def __init__(self, pos):
         super().__init__()
         self.pos = pos
-        self._addAnimation(Animation(BONUS_PATH, 1, 1, False))
+        self._addAnimation(Animation(BONUS_PATH, 1, False))
         self.scale(BONUS_SCALE)
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
         self.speed = 60
@@ -58,4 +59,13 @@ class Bonus(Entity):
         self.pos[0] = self.pos[0] + (self.vec[0] * self.speed * dt)
         self.pos[1] = self.pos[1] + (self.vec[1] * self.speed * dt)
         self.rect.topleft = tuple(self.pos)
+
+class Heart(Entity):
+    def __init__(self):
+        super().__init__()
+        self._addAnimation(Animation(HEART_PATH, 1, False))
+        self.scale(BONUS_SCALE)
+        self.rect = pygame.Rect((0, 0), self.animations[0].frame_size)
+    
+
     

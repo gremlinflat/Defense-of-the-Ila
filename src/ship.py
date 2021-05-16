@@ -1,6 +1,6 @@
 import pygame
 from Entity import Entity
-from SpriteAnim import *
+from SpriteAnim import Animation
 
 WIN_SIZE = (800, 600)
 
@@ -27,11 +27,11 @@ class Ship(Entity):
     def __init__(self, pos, speed, kolom, baris):
         super().__init__()
         self._addAnimation([
-            Animation(SHIP_ANIMATIONS_PATH["left"], 4, 1, True),
-            Animation(SHIP_ANIMATIONS_PATH["sleft"], 4, 1, True),
-            Animation(SHIP_ANIMATIONS_PATH["idle"], 4, 1, True),
-            Animation(SHIP_ANIMATIONS_PATH["sright"], 4, 1, True),
-            Animation(SHIP_ANIMATIONS_PATH["right"], 4, 1, True)
+            Animation(SHIP_ANIMATIONS_PATH["left"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH["sleft"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH["idle"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH["sright"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH["right"], 4, True)
         ])
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
 
@@ -53,7 +53,7 @@ class Ship(Entity):
         
 
         ##IMPLEMENT SHOOTING
-
+    
     # methon pergerakan pesawat
     def move(self, keys, dt):
         notPressed = True
