@@ -13,6 +13,7 @@ from SpriteAnim import BASE_ASSET_PATH, BASE_PATH
 PARALLAX_BG_PATH_FROM_ASSET = "bg2.jpg"
 MENU_IMAGE_PATH = "menu logo clear.png"
 CREDIT_IMAGE_PATH = "credit-pop up.jpg"
+GAMEOVER_IMAGE_PATH = "game over1.png"
 HEALTH_IMAGE_PATH = "health-bar 1.png"
 MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
 SCORE_FONT_PATH = "Minecraft.ttf"
@@ -57,6 +58,7 @@ class menu():
     def __init__(self,besar_layar, papan):
         self.gambar=pygame.image.load(os.path.join(BASE_ASSET_PATH, MENU_IMAGE_PATH))
         self.credit_image=pygame.image.load(os.path.join(BASE_ASSET_PATH, CREDIT_IMAGE_PATH))
+        self.gameover_image=pygame.image.load(os.path.join(BASE_ASSET_PATH, GAMEOVER_IMAGE_PATH))
         self.papan = papan
 
         self.start_btn = Write(
@@ -123,6 +125,22 @@ class menu():
             self.return_btn.draw(self.papan.layar)
 
             pygame.display.flip()
+    
+    def gameover_screen(self):
+        while True:
+            mouse_up = False
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                    mouse_up = True
+            self.papan.layar.blit(self.gameover_image,(0,0))
+
+            self.ui_action = self.return_btn.update(pygame.mouse.get_pos(), mouse_up)
+            if self.ui_action is not None:
+                return self.ui_action
+            
+            self.return_btn.draw(self.papan.layar)
+
+            pygame.display.flip()
 
 class Write(Sprite):
     def __init__(self, center_position, text, font_size, text_rgb, action=None):
@@ -177,6 +195,7 @@ class GameState(Enum):
     TITLE = 0
     NEWGAME = 1
     credit=2
+    GAMEOVER=-2
 
 def create_surface_with_text(text, font_size, text_rgb):
     """ Returns surface with text written on """
@@ -242,6 +261,9 @@ class Game:
 
             if self.game_state == GameState.credit:
                 self.game_state = self.Menu.credit_screen()
+            
+            if self.game_state == GameState.GAMEOVER:
+                self.game_state = self.Menu.gameover_screen()
 
             if self.game_state == GameState.QUIT:
                 pygame.quit()
@@ -262,7 +284,7 @@ class Game:
         
         for bonus in self.Bonuses:
             bonus.draw(self.papan)
-        #self.bg.render()
+
         self.show_score(self.papan)
         self.show_health(self.papan, self.ship.health)
         self.return_btn.draw(self.papan.layar)
@@ -406,7 +428,6 @@ class Game:
             self.__dt = self.delta_time(clock.tick(60))
         
         if self.ship.isDestroyed():
-            #GAME OVER
-            return GameState.TITLE
+            return GameState.GAMEOVER
         else:
             return GameState.TITLE
