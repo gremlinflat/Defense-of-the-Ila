@@ -40,7 +40,8 @@ class Ship(Entity):
         
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0)
-        self.bullet_list = [] 
+        self.bullet_list = []
+        self.health = 3 
 
 
     def update(self, screen, dt):
@@ -66,10 +67,6 @@ class Ship(Entity):
                 self.pos[0] %= WIN_SIZE[0]
         if notPressed:  # kondisi jika w, a, s, d tidak di tekan
             self.vec = (0, 0)
-
-        
-        
-            
         
         if self.vec[0] > 0:
             self._setnextAnim(4)
@@ -79,3 +76,9 @@ class Ship(Entity):
             self._setnextAnim(2)
         
         self.rect.topleft = tuple(self.pos)
+
+    def damage(self):
+        self.health -= 1
+
+    def isDestroyed(self):
+        return self.health <= 0

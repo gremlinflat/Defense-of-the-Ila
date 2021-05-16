@@ -12,6 +12,7 @@ PARALLAX_BG_PATH_FROM_ASSET = "bg2.jpg"
 MENU_IMAGE_PATH = "menu logo clear.png"
 CREDIT_IMAGE_PATH = "credit-pop up.jpg"
 MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
+SCORE_FONT_PATH = "Minecraft.ttf"
 #class layar
 
 class Papan:
@@ -183,13 +184,15 @@ def create_surface_with_text(text, font_size, text_rgb):
 
 SPAWN_COOLDOWN = 1000
 SHOOT_COOLDOWN = 1000
+SCORE_FONT_SIZE = 30
 class Game:
     def __init__(self, papan):
         self.__dt = 0
         self.papan = papan
 
-        self.ship = None
+        #self.ship = None
         self.Asteroids = []
+        self.bullets = []
         self.last_spawn = pygame.time.get_ticks()
         self.last_shoot = pygame.time.get_ticks()
         self.return_btn = Write(
@@ -201,8 +204,19 @@ class Game:
         )
         self.Menu=menu((self.papan.lebar,self.papan.tinggi), self.papan)
         self.game_state=GameState.TITLE
-        self.bullets = []
-        self.mouse_up = False
+        #self.mouse_up = False
+        self.score = 0
+    
+    def show_score(self, papan):
+        font = pygame.font.Font(os.path.join(BASE_ASSET_PATH, SCORE_FONT_PATH), SCORE_FONT_SIZE)
+        score_txt = font.render(f"Score : {self.score}", True, (255, 255, 255))
+        self.papan.layar.blit(score_txt, (0, 0))
+
+    def show_health(self, papan, health):
+        font = pygame.font.Font(os.path.join(BASE_ASSET_PATH, SCORE_FONT_PATH), SCORE_FONT_SIZE)
+        health_txt = font.render(f"Health : {health}", True, (255, 255, 255))
+        self.papan.layar.blit(health_txt, (0, 40))
+
 
     def game_loop(self):
         clock = pygame.time.Clock()
@@ -236,17 +250,20 @@ class Game:
         for bullet in self.bullets:
             bullet.draw(self.papan)
         #self.bg.render()
-        
+        self.show_score(self.papan)
+        self.show_health(self.papan, self.ship.health)
         self.return_btn.draw(self.papan.layar)
 
         pygame.display.flip()
 
     def update(self):
+        mouse_up = False
+
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                self.mouse_up = True
+                mouse_up = True
         
         now = pygame.time.get_ticks()
         if (now - self.last_spawn) >= SPAWN_COOLDOWN:
@@ -258,10 +275,9 @@ class Game:
             self.shoot()
             self.last_shoot = now
         
-        self.Menu.ui_action = self.return_btn.update(pygame.mouse.get_pos(), self.mouse_up)
         for Asteroid in self.Asteroids:
             if pygame.sprite.collide_rect(Asteroid, self.ship):
-                ## REDUCE HEALTH
+                self.ship.damage()
                 self.Asteroids.remove(Asteroid)
             Asteroid.update(self.__dt)
         
@@ -270,6 +286,7 @@ class Game:
                 if pygame.sprite.collide_rect(bullet, Asteroid):
                     self.Asteroids.remove(Asteroid)
                     self.bullets.remove(bullet)
+                    self.score += 1 if Asteroid.rect.width <= 80 else 5
             
             if bullet.pos[1] < 0:
                 self.bullets.remove(bullet)
@@ -279,6 +296,13 @@ class Game:
 
         if self.ship != None: 
             self.ship.update(self.papan ,self.__dt)
+        
+        if self.ship.isDestroyed():
+            self.play = False
+
+        self.Menu.ui_action = self.return_btn.update(pygame.mouse.get_pos(), mouse_up)
+        if self.Menu.ui_action:
+            self.play = False
         
         self.papan.update()
         
@@ -290,7 +314,7 @@ class Game:
 
     
     def spawn_asteroid(self):
-        rand_scale = random.randint(50, 100)
+        rand_scale = random.randint(40, 100)
         y = -rand_scale
         x = random.randint(0, self.papan.lebar - rand_scale)
         new_asteroid = Asteroid([x, y], (rand_scale, rand_scale))
@@ -307,14 +331,16 @@ class Game:
     def start_game(self, clock):
         self.ship = Ship((800, 600), 100, 4, 1)
         self.Asteroids = []
-        while True:
-            
-            self.mouse_up = False
-            
+        self.score = 0
+        self.play = True
+        while self.play:
+            #print(self.play)
             self.update()
-            
-            if self.Menu.ui_action:
-                return GameState.TITLE
-            
             self.draw()
             self.__dt = self.delta_time(clock.tick(30))
+        
+        if self.ship.isDestroyed():
+            #GAME OVER
+            return GameState.TITLE
+        else:
+            return GameState.TITLE
