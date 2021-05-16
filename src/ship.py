@@ -1,6 +1,6 @@
 import pygame
 from Entity import Entity
-from SpriteAnim import *
+from SpriteAnim import Animation
 
 WIN_SIZE = (800, 600)
 
@@ -27,11 +27,11 @@ class Ship(Entity):
     def __init__(self, pos, speed, kolom, baris):
         super().__init__()
         self._addAnimation([
-            Animation(SHIP_ANIMATIONS_PATH["left"], 4, 1, True),
-            Animation(SHIP_ANIMATIONS_PATH["sleft"], 4, 1, True),
-            Animation(SHIP_ANIMATIONS_PATH["idle"], 4, 1, True),
-            Animation(SHIP_ANIMATIONS_PATH["sright"], 4, 1, True),
-            Animation(SHIP_ANIMATIONS_PATH["right"], 4, 1, True)
+            Animation(SHIP_ANIMATIONS_PATH["left"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH["sleft"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH["idle"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH["sright"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH["right"], 4, True)
         ])
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
 
@@ -40,6 +40,8 @@ class Ship(Entity):
         
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0)
+        self.bullet_list = []
+        self.health = 3 
 
 
     def update(self, screen, dt):
@@ -48,9 +50,10 @@ class Ship(Entity):
 
         self.pos[0] = min(max(self.pos[0], 0), screen.lebar - (self.rect.width))
         self.pos[1] = min(max(self.pos[1], 0), screen.tinggi - (self.rect.height))
-        print(self.pos, self.rect.center)
+        
 
-
+        ##IMPLEMENT SHOOTING
+    
     # methon pergerakan pesawat
     def move(self, keys, dt):
         notPressed = True
@@ -64,10 +67,6 @@ class Ship(Entity):
                 self.pos[0] %= WIN_SIZE[0]
         if notPressed:  # kondisi jika w, a, s, d tidak di tekan
             self.vec = (0, 0)
-
-        
-        
-            
         
         if self.vec[0] > 0:
             self._setnextAnim(4)
@@ -76,5 +75,10 @@ class Ship(Entity):
         else:
             self._setnextAnim(2)
         
-        self.rect.center = tuple(self.pos)
+        self.rect.topleft = tuple(self.pos)
 
+    def damage(self):
+        self.health -= 1
+
+    def isDestroyed(self):
+        return self.health <= 0

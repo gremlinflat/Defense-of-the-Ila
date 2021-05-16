@@ -16,6 +16,14 @@ class Entity(pygame.sprite.Sprite):
 
         self.animations[self.selected_animation].draw(window, self.pos)
 
+    def draw_pos(self, window, pos):
+        if self.selected_animation > self.next_animation:
+            self.selected_animation -= 1
+        elif self.selected_animation < self.next_animation:
+            self.selected_animation += 1
+        
+        self.animations[self.selected_animation].draw(window, pos)
+
     def update(self):
         pass
     

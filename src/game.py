@@ -1,17 +1,21 @@
 import pygame
 import os
-from ship import *
-from item import *
+from ship import Ship
+from item import Bonus, Asteroid, Bullet, BULLET_SCALE, Heart
+from random import randint
 import pygame.freetype
 from pygame.sprite import Sprite
 from pygame.rect import Rect
 from enum import Enum
+from SpriteAnim import BASE_ASSET_PATH, BASE_PATH
 
 
 PARALLAX_BG_PATH_FROM_ASSET = "bg2.jpg"
 MENU_IMAGE_PATH = "menu logo clear.png"
 CREDIT_IMAGE_PATH = "credit-pop up.jpg"
+HEALTH_IMAGE_PATH = "health-bar 1.png"
 MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
+SCORE_FONT_PATH = "Minecraft.ttf"
 #class layar
 
 class Papan:
@@ -181,17 +185,21 @@ def create_surface_with_text(text, font_size, text_rgb):
     return surface.convert_alpha()
 
 
-SPAWN_COOLDOWN = 1000
-
-
+SPAWN_COOLDOWN = 1
+SHOOT_COOLDOWN = 1
+SCORE_FONT_SIZE = 30
 class Game:
     def __init__(self, papan):
         self.__dt = 0
         self.papan = papan
 
-        self.ship = None
-        self.Asteroids = []
-        self.last = pygame.time.get_ticks()
+        #self.ship = None
+        self.asteroids = []
+        self.bullets = []
+        self.bonuses = []
+        self.bonus_timer = 0
+        self.spawn_delay = 0
+        self.shoot_delay = 0
         self.return_btn = Write(
                 center_position=(140, 570),
                 font_size=15,
@@ -201,7 +209,24 @@ class Game:
         )
         self.Menu=menu((self.papan.lebar,self.papan.tinggi), self.papan)
         self.game_state=GameState.TITLE
+        #self.mouse_up = False
+        self.score = 0
+        self.heart = Heart()
+
+
+
     
+    def show_score(self, papan):
+        font = pygame.font.Font(os.path.join(BASE_ASSET_PATH, SCORE_FONT_PATH), SCORE_FONT_SIZE)
+        score_txt = font.render(f"Score : {self.score}", True, (255, 255, 255))
+        self.papan.layar.blit(score_txt, (0, self.heart.rect.width))
+
+    def show_health(self, papan, health):
+        x = 0
+        for i in range(health):
+            self.heart.draw_pos(self.papan, (x, 0))
+            x += self.heart.rect.width
+
 
     def game_loop(self):
         clock = pygame.time.Clock()
@@ -211,7 +236,6 @@ class Game:
 
             if self.game_state == GameState.TITLE:     
                 self.game_state = self.Menu.title_screen()
-
 
             if self.game_state == GameState.NEWGAME:
                 self.game_state = self.start_game(clock)
@@ -230,32 +254,89 @@ class Game:
         if self.ship != None:
             self.ship.draw(self.papan)
 
-        for Asteorid in self.Asteroids:
+        for Asteorid in self.asteroids:
             Asteorid.draw(self.papan)
         
+        for bullet in self.bullets:
+            bullet.draw(self.papan)
+        
+        for bonus in self.Bonuses:
+            bonus.draw(self.papan)
+        #self.bg.render()
+        self.show_score(self.papan)
+        self.show_health(self.papan, self.ship.health)
         self.return_btn.draw(self.papan.layar)
-
         pygame.display.flip()
 
     def update(self):
-        
+        mouse_up = False
 
-        for As in self.Asteroids:
-            if pygame.sprite.collide_rect(As, self.ship):
-                self.Asteroids.remove(As)
-
-            As.update(self.__dt)
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                mouse_up = True
         
+        
+        if self.spawn_delay > 0:
+            self.spawn_delay -= self.__dt
+        else:
+            self.spawn_asteroid()
+            self.spawn_delay = SPAWN_COOLDOWN
+        
+        if self.bonus_timer > 0:
+            self.bonus_timer -= self.__dt
+        else:
+            self.bonus_timer = 0
+        
+        if self.shoot_delay > 0:
+            self.shoot_delay -= self.__dt
+        else: 
+            if keys[pygame.K_SPACE]:
+                self.shoot()
+                self.shoot_delay = SHOOT_COOLDOWN
+        
+        for asteroid in self.asteroids:
+            if pygame.sprite.collide_rect(asteroid, self.ship):
+                self.ship.damage()
+                self.asteroids.remove(asteroid)
+            asteroid.update(self.__dt)
+        
+        for bullet in self.bullets:
+            if bullet.pos[1] < 0:
+                self.bullets.remove(bullet)
+                continue
+            
+            for asteroid in self.asteroids:
+                if pygame.sprite.collide_rect(bullet, asteroid):
+                    self.asteroids.remove(asteroid)
+                    self.bullets.remove(bullet)
+                    self.score += 1 if asteroid.rect.width <= 80 else 5
+                    self.asteroid_shooted += 1
+                    if self.asteroid_shooted >= 5:
+                        self.asteroid_shooted = 0
+                        self.create_bonus(asteroid.pos)
+
+            
+            bullet.update(self.__dt)
+        
+        for bonus in self.Bonuses:
+            if pygame.sprite.collide_rect(bonus, self.ship):
+                self.Bonuses.remove(bonus)
+                self.get_bonus()
+            bonus.update(self.__dt)
+
         if self.ship != None: 
             self.ship.update(self.papan ,self.__dt)
         
-        self.papan.update()
-        
-        now = pygame.time.get_ticks()
-        if (now - self.last) >= SPAWN_COOLDOWN:
-            self.spawn_asteroid()
-            self.last = now
+        if self.ship.isDestroyed():
+            self.play = False
 
+        self.Menu.ui_action = self.return_btn.update(pygame.mouse.get_pos(), mouse_up)
+        if self.Menu.ui_action:
+            self.play = False
+        
+        self.papan.update()
         
 
 
@@ -264,31 +345,68 @@ class Game:
     def delta_time(self, time_between):
         return time_between / 1000.0
 
-    
+    def get_bonus(self):
+        self.bonus_timer = 3
+
     def spawn_asteroid(self):
-        rand_scale = random.randint(50, 100)
+        rand_scale = randint(40, 100)
         y = -rand_scale
-        x = random.randint(0, self.papan.lebar - rand_scale)
+        x = randint(0, self.papan.lebar - rand_scale)
         new_asteroid = Asteroid([x, y], (rand_scale, rand_scale))
-        self.Asteroids.append(new_asteroid)
+        self.asteroids.append(new_asteroid)
 
-    def start_game(self, clock):
-        self.ship = Ship((800, 600), 100, 4, 1)
-        self.Asteroids = []
-        while True:
-            self.update()
-            mouse_up = False
+    def shoot(self):
+        
+        if self.bonus_timer <= 0:
+            x = self.ship.rect.topleft[0] + (self.ship.rect.width/2) - (BULLET_SCALE[0]/2) - 2
+            y = self.ship.rect.topleft[1] - (BULLET_SCALE[1]/2)
+            new_bullet = Bullet([x, y])
+            self.bullets.append(new_bullet)
+        else:
+            x = self.ship.rect.topleft[0] + (self.ship.rect.width/2) - (BULLET_SCALE[0]/2) - 2
+            y = self.ship.rect.topleft[1] - (BULLET_SCALE[1]/2)
+            new_bullet = Bullet([x, y])
             
-            events = pygame.event.get()
-            for event in events:
+            self.bullets.append(new_bullet)
+            
 
-                if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                    mouse_up = True
-            self.Menu.ui_action = self.return_btn.update(pygame.mouse.get_pos(), mouse_up)
-            if self.Menu.ui_action:
-                return GameState.TITLE
+            x = self.ship.rect.topleft[0] + (self.ship.rect.width/2) - (BULLET_SCALE[0]/2) - 22
+            y = self.ship.rect.topleft[1] - (BULLET_SCALE[1]/2) + 20
+            new_bullet = Bullet([x, y])
 
+            self.bullets.append(new_bullet)
+
+            x = self.ship.rect.topleft[0] + (self.ship.rect.width/2) - (BULLET_SCALE[0]/2) + 18
+            y = self.ship.rect.topleft[1] - (BULLET_SCALE[1]/2) + 20
+            new_bullet = Bullet([x, y])
+
+            self.bullets.append(new_bullet)
+
+    def create_bonus(self, pos):
+        x = pos[0]
+        y = pos[1]
+        new_bonus = Bonus([x, y])
+        self.Bonuses.append(new_bonus)
+    
+    def start_game(self, clock):
+        self.ship = Ship((800, 600), 150, 4, 1)
+        self.asteroids = []
+        self.bullets = []
+        self.Bonuses = []
+        self.score = 0
+        self.asteroid_shooted = 0
+        self.play = True
+
+        while self.play:
+            #print(self.play)
+            self.update()
+            
             self.draw()
-            self.__dt = self.delta_time(clock.tick(30))
-
-
+            print(self.bonus_timer)
+            self.__dt = self.delta_time(clock.tick(60))
+        
+        if self.ship.isDestroyed():
+            #GAME OVER
+            return GameState.TITLE
+        else:
+            return GameState.TITLE
