@@ -17,18 +17,25 @@ GAMEOVER_IMAGE_PATH = "game over1.png"
 HEALTH_IMAGE_PATH = "health-bar 1.png"
 MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
 SCORE_FONT_PATH = "Minecraft.ttf"
+SHOT_SOUND =  "laser2.mp3"
+DEAD_SOUND = "death.mp3"
 #class layar
 
 class Papan:
     def __init__(self, besar_layar):
         # inisialisasi pygame
         pygame.init()
+        pygame.mixer.init()
+        
         self.lebar = besar_layar[0]
         self.tinggi = besar_layar[1]
         # membuat object layar dengan sebesar {besar_layar}
         self.layar = pygame.display.set_mode(besar_layar)
 
         self.bgimage = pygame.image.load(os.path.join(BASE_ASSET_PATH, PARALLAX_BG_PATH_FROM_ASSET))
+
+        self.shot= pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH, SHOT_SOUND))
+        self.dead= pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH, DEAD_SOUND))
 
         self.rectBGimg = self.bgimage.get_rect()
 
@@ -280,6 +287,7 @@ class Game:
             Asteorid.draw(self.papan)
         
         for bullet in self.bullets:
+            # pygame.mixer.Sound.play(self.papan.shot)
             bullet.draw(self.papan)
         
         for bonus in self.Bonuses:
@@ -315,6 +323,7 @@ class Game:
             self.shoot_delay -= self.__dt
         else: 
             if keys[pygame.K_SPACE]:
+                pygame.mixer.Sound.play(self.papan.shot)
                 self.shoot()
                 self.shoot_delay = SHOOT_COOLDOWN
         
@@ -428,6 +437,7 @@ class Game:
             self.__dt = self.delta_time(clock.tick(60))
         
         if self.ship.isDestroyed():
+            pygame.mixer.Sound.play(self.papan.dead)
             return GameState.GAMEOVER
         else:
             return GameState.TITLE
