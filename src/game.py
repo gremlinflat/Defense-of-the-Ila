@@ -250,6 +250,7 @@ class Game:
         #self.mouse_up = False
         self.score = 0
         self.heart = Heart()
+        self.bonus_taken = 0
 
     def show_score(self, papan):
         font = pygame.font.Font(os.path.join(
@@ -360,6 +361,9 @@ class Game:
             if pygame.sprite.collide_rect(bonus, self.ship):
                 self.Bonuses.remove(bonus)
                 self.get_bonus()
+                self.bonus_taken += 1
+                if self.bonus_taken % 2 == 0:
+                    self.ship.upgrade_ship()
             bonus.update(self.__dt)
 
         if self.ship != None:
@@ -374,7 +378,6 @@ class Game:
             self.play = False
 
         self.papan.update()
-
     # mendapatkan jarak waktu antara dua frame dalam satuan detik
 
     def delta_time(self, time_between):
