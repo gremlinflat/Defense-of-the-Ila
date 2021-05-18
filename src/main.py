@@ -1,8 +1,8 @@
-from game import *
+from game import Game, Window
 
-BESAR_LAYAR = (800, 600)
+DISPLAY_SIZE = (800, 600)
 
-win = Papan(BESAR_LAYAR)
+win = Window(DISPLAY_SIZE)
 game = Game(win) 
 
 def main():

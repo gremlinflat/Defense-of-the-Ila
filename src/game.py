@@ -1,7 +1,7 @@
 import pygame
 import os
 from ship import Ship
-from item import Bonus, Asteroid, Bullet, BULLET_SCALE, Heart
+from item import Bonus, Asteroid, Bullet, BULLET_SCALE, Heart, Explosions_vfx
 from random import randint
 import pygame.freetype
 from pygame.sprite import Sprite
@@ -17,20 +17,25 @@ GAMEOVER_IMAGE_PATH = "game over1.png"
 HEALTH_IMAGE_PATH = "health-bar 1.png"
 MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
 SCORE_FONT_PATH = "Minecraft.ttf"
-# class layar
+SHOT_SOUND =  "laser2.mp3"
+DEAD_SOUND = "death.mp3"
+FPS = 60
+#class layar
 
-
-class Papan:
-    def __init__(self, besar_layar):
+class Window:
+    def __init__(self, window_size):
         # inisialisasi pygame
         pygame.init()
-        self.lebar = besar_layar[0]
-        self.tinggi = besar_layar[1]
-        # membuat object layar dengan sebesar {besar_layar}
-        self.layar = pygame.display.set_mode(besar_layar)
+        pygame.mixer.init()
+        
+        self.width = window_size[0]
+        self.height = window_size[1]
+        # membuat object layar dengan sebesar {window_size}
+        self.display = pygame.display.set_mode(window_size)
 
         self.bgimage = pygame.image.load(os.path.join(
             BASE_ASSET_PATH, PARALLAX_BG_PATH_FROM_ASSET))
+
 
         self.rectBGimg = self.bgimage.get_rect()
 
@@ -40,30 +45,30 @@ class Papan:
         self.bgY2 = -self.rectBGimg.height
         self.bgX2 = 0
 
-        self.gerak = 2
+        self.speed = 2
 
     def update(self):
-        self.bgY1 += self.gerak
-        self.bgY2 += self.gerak
+        self.bgY1 += self.speed
+        self.bgY2 += self.speed
         if self.bgY1 >= self.rectBGimg.height:
             self.bgY1 = -self.rectBGimg.height
         if self.bgY2 >= self.rectBGimg.height:
             self.bgY2 = -self.rectBGimg.height
 
     def draw(self):
-        self.layar.blit(self.bgimage, (self.bgX2, self.bgY2))
-        self.layar.blit(self.bgimage, (self.bgX1, self.bgY1))
+        self.display.blit(self.bgimage, (self.bgX2, self.bgY2))
+        self.display.blit(self.bgimage, (self.bgX1, self.bgY1))
 
 
 class menu():
-    def __init__(self, besar_layar, papan):
+    def __init__(self, window_size, window):
         self.gambar = pygame.image.load(
             os.path.join(BASE_ASSET_PATH, MENU_IMAGE_PATH))
         self.credit_image = pygame.image.load(
             os.path.join(BASE_ASSET_PATH, CREDIT_IMAGE_PATH))
         self.gameover_image = pygame.image.load(
             os.path.join(BASE_ASSET_PATH, GAMEOVER_IMAGE_PATH))
-        self.papan = papan
+        self.window = window
 
         self.start_btn = Write(
             center_position=(395, 325),
@@ -104,14 +109,14 @@ class menu():
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                     mouse_up = True
-            self.papan.layar.blit(self.gambar, (0, 0))
+            self.window.display.blit(self.gambar, (0, 0))
 
             for button in self.buttons:
                 self.ui_action = button.update(
                     pygame.mouse.get_pos(), mouse_up)
                 if self.ui_action is not None:
                     return self.ui_action
-                button.draw(self.papan.layar)
+                button.draw(self.window.display)
 
             pygame.display.flip()
 
@@ -121,14 +126,14 @@ class menu():
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                     mouse_up = True
-            self.papan.layar.blit(self.credit_image, (0, 0))
+            self.window.display.blit(self.credit_image, (0, 0))
 
             self.ui_action = self.return_btn.update(
                 pygame.mouse.get_pos(), mouse_up)
             if self.ui_action is not None:
                 return self.ui_action
 
-            self.return_btn.draw(self.papan.layar)
+            self.return_btn.draw(self.window.display)
 
             pygame.display.flip()
 
@@ -138,14 +143,14 @@ class menu():
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                     mouse_up = True
-            self.papan.layar.blit(self.gameover_image, (0, 0))
+            self.window.display.blit(self.gameover_image, (0, 0))
 
             self.ui_action = self.return_btn.update(
                 pygame.mouse.get_pos(), mouse_up)
             if self.ui_action is not None:
                 return self.ui_action
 
-            self.return_btn.draw(self.papan.layar)
+            self.return_btn.draw(self.window.display)
 
             pygame.display.flip()
 
@@ -221,14 +226,15 @@ SCORE_FONT_SIZE = 30
 
 
 class Game:
-    def __init__(self, papan):
+    def __init__(self, window):
         self.__dt = 0
-        self.papan = papan
+        self.window = window
 
         #self.ship = None
         self.asteroids = []
         self.bullets = []
         self.bonuses = []
+        self.vfxs = []
         self.bonus_timer = 0
         self.spawn_delay = 0
         self.shoot_delay = 0
@@ -239,22 +245,25 @@ class Game:
             text="Return to main menu",
             action=GameState.TITLE,
         )
-        self.Menu = menu((self.papan.lebar, self.papan.tinggi), self.papan)
+        self.Menu = menu((self.window.width, self.window.height), self.window)
         self.game_state = GameState.TITLE
         #self.mouse_up = False
         self.score = 0
         self.heart = Heart()
+        self.bonus_taken = 0
+        self.shot_sfx= pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH, SHOT_SOUND))
+        self.dead_sfx= pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH, DEAD_SOUND))
 
-    def show_score(self, papan):
+    def show_score(self, window):
         font = pygame.font.Font(os.path.join(
             BASE_ASSET_PATH, SCORE_FONT_PATH), SCORE_FONT_SIZE)
         score_txt = font.render(f"Score : {self.score}", True, (255, 255, 255))
-        self.papan.layar.blit(score_txt, (0, self.heart.rect.width))
+        self.window.display.blit(score_txt, (0, self.heart.rect.width))
 
-    def show_health(self, papan, health):
+    def show_health(self, window, health):
         x = 0
         for i in range(health):
-            self.heart.draw_pos(self.papan, (x, 0))
+            self.heart.draw_pos(self.window, (x, 0))
             x += self.heart.rect.width
 
     def game_loop(self):
@@ -279,23 +288,27 @@ class Game:
                 return
 
     def draw(self):
-        self.papan.draw()
+        self.window.draw()
 
         if self.ship != None:
-            self.ship.draw(self.papan)
+            self.ship.draw(self.window)
 
         for Asteorid in self.asteroids:
-            Asteorid.draw(self.papan)
+            Asteorid.draw(self.window)
 
         for bullet in self.bullets:
-            bullet.draw(self.papan)
+            # pygame.mixer.Sound.play(self.window.shot)
+            bullet.draw(self.window)
 
         for bonus in self.Bonuses:
-            bonus.draw(self.papan)
+            bonus.draw(self.window)
 
-        self.show_score(self.papan)
-        self.show_health(self.papan, self.ship.health)
-        self.return_btn.draw(self.papan.layar)
+        for vfx in self.vfxs:
+            vfx.draw(self.window)
+
+        self.show_score(self.window)
+        self.show_health(self.window, self.ship.health)
+        self.return_btn.draw(self.window.display)
         pygame.display.flip()
 
     def update(self):
@@ -322,12 +335,14 @@ class Game:
             self.shoot_delay -= self.__dt
         else:
             if keys[pygame.K_SPACE]:
+                pygame.mixer.Sound.play(self.shot_sfx)
                 self.shoot()
                 self.shoot_delay = SHOOT_COOLDOWN
 
         for asteroid in self.asteroids:
             if pygame.sprite.collide_rect(asteroid, self.ship):
                 self.ship.damage()
+                self.create_explosions(asteroid.pos, asteroid.animations[0].frame_size)
                 self.asteroids.remove(asteroid)
             asteroid.update(self.__dt)
 
@@ -340,6 +355,7 @@ class Game:
                 if pygame.sprite.collide_rect(bullet, asteroid):
                     self.asteroids.remove(asteroid)
                     self.bullets.remove(bullet)
+                    self.create_explosions(asteroid.pos, asteroid.animations[0].frame_size)
                     self.score += 1 if asteroid.rect.width <= 80 else 5
                     self.asteroid_shooted += 1
                     if self.asteroid_shooted >= 5:
@@ -352,10 +368,17 @@ class Game:
             if pygame.sprite.collide_rect(bonus, self.ship):
                 self.Bonuses.remove(bonus)
                 self.get_bonus()
+                self.bonus_taken += 1
+                if self.bonus_taken % 10 == 0:
+                    self.ship.upgrade_ship()
             bonus.update(self.__dt)
 
+        for vfx in self.vfxs:
+            if vfx.anim_done():
+                self.vfxs.remove(vfx)
+
         if self.ship != None:
-            self.ship.update(self.papan, self.__dt)
+            self.ship.update(self.window, self.__dt)
 
         if self.ship.isDestroyed():
             self.play = False
@@ -365,8 +388,7 @@ class Game:
         if self.Menu.ui_action:
             self.play = False
 
-        self.papan.update()
-
+        self.window.update()
     # mendapatkan jarak waktu antara dua frame dalam satuan detik
 
     def delta_time(self, time_between):
@@ -378,7 +400,7 @@ class Game:
     def spawn_asteroid(self):
         rand_scale = randint(40, 100)
         y = -rand_scale
-        x = randint(0, self.papan.lebar - rand_scale)
+        x = randint(0, self.window.width - rand_scale)
         new_asteroid = Asteroid([x, y], (rand_scale, rand_scale))
         self.asteroids.append(new_asteroid)
 
@@ -417,7 +439,13 @@ class Game:
         y = pos[1]
         new_bonus = Bonus([x, y])
         self.Bonuses.append(new_bonus)
-
+    
+    def create_explosions(self, pos, scale):
+        x = pos[0]
+        y = pos[1]
+        new_explosions = Explosions_vfx([x, y], scale)
+        self.vfxs.append(new_explosions)
+        
     def start_game(self, clock):
         self.ship = Ship((800, 600), 150, 4, 1)
         self.asteroids = []
@@ -432,10 +460,11 @@ class Game:
             self.update()
 
             self.draw()
-            print(self.bonus_timer)
-            self.__dt = self.delta_time(clock.tick(60))
+            #print(self.vfxs)
+            self.__dt = self.delta_time(clock.tick(FPS))
 
         if self.ship.isDestroyed():
+            pygame.mixer.Sound.play(self.dead_sfx)
             return GameState.GAMEOVER
         else:
             return GameState.TITLE

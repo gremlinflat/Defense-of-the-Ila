@@ -6,7 +6,7 @@ BASE_ASSET_PATH = os.path.join(BASE_PATH, os.pardir, "assets")
 
 DELAY_ANTARA_FRAME = 100
 class Animation:
-    def __init__(self, img_name, kolom, loop):
+    def __init__(self, img_name, frame_count, loop):
         # ambil alamat directory (absolute)
 
         # ambil spritesheet dari folder assets
@@ -18,18 +18,20 @@ class Animation:
         self.loop = loop
 
         self.cooldown = DELAY_ANTARA_FRAME
-
+        self.frame_count = frame_count
         self.last = pygame.time.get_ticks()
         # list frame yang dapat dari spritesheet
         self.frames = []
         spritesheet_size = self.sheet.get_size()
         # parsing frames dari spritesheet
-        self.frame_size = (spritesheet_size[0] // kolom , spritesheet_size[1])
-        for i in range(kolom):
+        self.frame_size = (spritesheet_size[0] // frame_count , spritesheet_size[1])
+        for i in range(frame_count):
             pos = (self.frame_size[0] * i, 0)
             frame = self.sheet.subsurface(pygame.Rect(pos, self.frame_size))
             self.frames.append(frame)
     
+    def get_current_frame(self):
+        return self.__current_frame
 
     def scale(self, size):
         new_frames = []
@@ -49,7 +51,7 @@ class Animation:
 
     # draw frame di pojok kiri atas
     def draw(self, window):
-        window.layar.blit(self.frames[self.__current_frame], (0,0))
+        window.display.blit(self.frames[self.__current_frame], (0,0))
 
     # draw frame di pos
     def draw(self, window, pos):
@@ -63,7 +65,7 @@ class Animation:
                 self.__current_frame = (self.__current_frame + 1)
                 self.last = now
 
-        window.layar.blit(self.frames[self.__current_frame], pos) 
+        window.display.blit(self.frames[self.__current_frame], pos) 
 
 
     def getcurFrame(self):
