@@ -1,7 +1,7 @@
 import pygame
 import os
 from ship import Ship
-from item import Bonus, Asteroid, Bullet, BULLET_SCALE, Heart
+from item import Bonus, Asteroid, Bullet, BULLET_SCALE, Heart, Explosions_vfx
 from random import randint
 import pygame.freetype
 from pygame.sprite import Sprite
@@ -19,6 +19,7 @@ MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
 SCORE_FONT_PATH = "Minecraft.ttf"
 SHOT_SOUND =  "laser2.mp3"
 DEAD_SOUND = "death.mp3"
+FPS = 60
 #class layar
 
 class Papan:
@@ -35,8 +36,6 @@ class Papan:
         self.bgimage = pygame.image.load(os.path.join(
             BASE_ASSET_PATH, PARALLAX_BG_PATH_FROM_ASSET))
 
-        self.shot= pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH, SHOT_SOUND))
-        self.dead= pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH, DEAD_SOUND))
 
         self.rectBGimg = self.bgimage.get_rect()
 
@@ -235,6 +234,7 @@ class Game:
         self.asteroids = []
         self.bullets = []
         self.bonuses = []
+        self.vfxs = []
         self.bonus_timer = 0
         self.spawn_delay = 0
         self.shoot_delay = 0
@@ -251,6 +251,8 @@ class Game:
         self.score = 0
         self.heart = Heart()
         self.bonus_taken = 0
+        self.shot_sfx= pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH, SHOT_SOUND))
+        self.dead_sfx= pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH, DEAD_SOUND))
 
     def show_score(self, papan):
         font = pygame.font.Font(os.path.join(
@@ -301,6 +303,9 @@ class Game:
         for bonus in self.Bonuses:
             bonus.draw(self.papan)
 
+        for vfx in self.vfxs:
+            vfx.draw(self.papan)
+
         self.show_score(self.papan)
         self.show_health(self.papan, self.ship.health)
         self.return_btn.draw(self.papan.layar)
@@ -330,13 +335,14 @@ class Game:
             self.shoot_delay -= self.__dt
         else:
             if keys[pygame.K_SPACE]:
-                pygame.mixer.Sound.play(self.papan.shot)
+                pygame.mixer.Sound.play(self.shot_sfx)
                 self.shoot()
                 self.shoot_delay = SHOOT_COOLDOWN
 
         for asteroid in self.asteroids:
             if pygame.sprite.collide_rect(asteroid, self.ship):
                 self.ship.damage()
+                self.create_explosions(asteroid.pos, asteroid.animations[0].frame_size)
                 self.asteroids.remove(asteroid)
             asteroid.update(self.__dt)
 
@@ -349,6 +355,7 @@ class Game:
                 if pygame.sprite.collide_rect(bullet, asteroid):
                     self.asteroids.remove(asteroid)
                     self.bullets.remove(bullet)
+                    self.create_explosions(asteroid.pos, asteroid.animations[0].frame_size)
                     self.score += 1 if asteroid.rect.width <= 80 else 5
                     self.asteroid_shooted += 1
                     if self.asteroid_shooted >= 5:
@@ -362,9 +369,13 @@ class Game:
                 self.Bonuses.remove(bonus)
                 self.get_bonus()
                 self.bonus_taken += 1
-                if self.bonus_taken % 2 == 0:
+                if self.bonus_taken % 10 == 0:
                     self.ship.upgrade_ship()
             bonus.update(self.__dt)
+
+        for vfx in self.vfxs:
+            if vfx.anim_done():
+                self.vfxs.remove(vfx)
 
         if self.ship != None:
             self.ship.update(self.papan, self.__dt)
@@ -428,7 +439,13 @@ class Game:
         y = pos[1]
         new_bonus = Bonus([x, y])
         self.Bonuses.append(new_bonus)
-
+    
+    def create_explosions(self, pos, scale):
+        x = pos[0]
+        y = pos[1]
+        new_explosions = Explosions_vfx([x, y], scale)
+        self.vfxs.append(new_explosions)
+        
     def start_game(self, clock):
         self.ship = Ship((800, 600), 150, 4, 1)
         self.asteroids = []
@@ -443,11 +460,11 @@ class Game:
             self.update()
 
             self.draw()
-            print(self.bonus_timer)
-            self.__dt = self.delta_time(clock.tick(60))
+            #print(self.vfxs)
+            self.__dt = self.delta_time(clock.tick(FPS))
 
         if self.ship.isDestroyed():
-            pygame.mixer.Sound.play(self.papan.dead)
+            pygame.mixer.Sound.play(self.dead_sfx)
             return GameState.GAMEOVER
         else:
             return GameState.TITLE

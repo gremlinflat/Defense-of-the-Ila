@@ -23,7 +23,7 @@ class Bullet(Entity):
 ASTEROID_PATH = "meteor3.png"
 BONUS_PATH = "rocket bonus.png"
 HEART_PATH = "health-bar 1.png"
-
+EXPLOSION_PATH = "explosionsprite.png"
 class Asteroid(Entity):
     def __init__(self, pos, scale):
         super().__init__()
@@ -43,7 +43,7 @@ class Asteroid(Entity):
         self.rect.topleft = tuple(self.pos)
 
 BONUS_SCALE = (30, 30)
-
+BULLET_SPEED = 160
 class Bonus(Entity):
     def __init__(self, pos):
         super().__init__()
@@ -51,7 +51,7 @@ class Bonus(Entity):
         self._addAnimation(Animation(BONUS_PATH, 1, False))
         self.scale(BONUS_SCALE)
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
-        self.speed = 60
+        self.speed = BULLET_SPEED
         x = uniform(-0.5, 0.5)
         self.vec = [x, 1]
 
@@ -67,5 +67,13 @@ class Heart(Entity):
         self.scale(BONUS_SCALE)
         self.rect = pygame.Rect((0, 0), self.animations[0].frame_size)
     
-
+class Explosions_vfx(Entity):
+    def __init__(self, pos, scale):
+        super().__init__()
+        self.pos = pos
+        self._addAnimation(Animation(EXPLOSION_PATH, 4, False))
+        self.scale(scale)
+        self.rect = pygame.Rect(pos, self.animations[0].frame_size)
     
+    def anim_done(self):
+        return  self.animations[self.selected_animation].get_current_frame() >= self.animations[self.selected_animation].frame_count - 1
