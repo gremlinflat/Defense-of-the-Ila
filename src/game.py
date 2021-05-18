@@ -18,7 +18,10 @@ HEALTH_IMAGE_PATH = "health-bar 1.png"
 MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
 SCORE_FONT_PATH = "Minecraft.ttf"
 SHOT_SOUND =  "laser2.mp3"
+BACKGROUND_SOUND = "Background Menu Sound.mp3"
+BONUS_SOUND = "item bonus sound.mp3"
 DEAD_SOUND = "death.mp3"
+EXPLOSION_SOUND = "explosion_sound.mp3"
 FPS = 60
 #class layar
 
@@ -62,6 +65,7 @@ class Window:
 
 class menu():
     def __init__(self, window_size, window):
+        
         self.gambar = pygame.image.load(
             os.path.join(BASE_ASSET_PATH, MENU_IMAGE_PATH))
         self.credit_image = pygame.image.load(
@@ -104,6 +108,7 @@ class menu():
 
     def title_screen(self):
         self.buttons = [self.start_btn, self.credit_btn, self.quit_btn]
+        
         while True:
             mouse_up = False
             for event in pygame.event.get():
@@ -229,7 +234,9 @@ class Game:
     def __init__(self, window):
         self.__dt = 0
         self.window = window
-
+        self.bg_sfx = pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH,BACKGROUND_SOUND))
+        self.bonus_sfx = pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH,BONUS_SOUND))
+        self.explosion_sfx = pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH,EXPLOSION_SOUND))
         #self.ship = None
         self.asteroids = []
         self.bullets = []
@@ -272,10 +279,12 @@ class Game:
         while True:
 
             if self.game_state == GameState.TITLE:
+                pygame.mixer.Sound.play(self.bg_sfx)
                 self.game_state = self.Menu.title_screen()
-
+            
             if self.game_state == GameState.NEWGAME:
-                self.game_state = self.start_game(clock)
+                pygame.mixer.Sound.stop(self.bg_sfx)
+                self.game_state = self.start_game(clock)               
 
             if self.game_state == GameState.credit:
                 self.game_state = self.Menu.credit_screen()
@@ -396,6 +405,7 @@ class Game:
 
     def get_bonus(self):
         self.bonus_timer = 3
+        pygame.mixer.Sound.play(self.bonus_sfx)
 
     def spawn_asteroid(self):
         rand_scale = randint(40, 100)
@@ -445,6 +455,7 @@ class Game:
         y = pos[1]
         new_explosions = Explosions_vfx([x, y], scale)
         self.vfxs.append(new_explosions)
+        pygame.mixer.Sound.play(self.explosion_sfx)
         
     def start_game(self, clock):
         self.ship = Ship((800, 600), 150, 4, 1)
