@@ -66,12 +66,12 @@ class Ship(Entity):
         ]
         self.animations = new_animations
 
-    def update(self, screen, dt):
+    def update(self, window, dt):
         keys = pygame.key.get_pressed()
         self.move(keys, dt)
 
-        self.pos[0] = min(max(self.pos[0], 0), screen.lebar - (self.rect.width))
-        self.pos[1] = min(max(self.pos[1], 0), screen.tinggi - (self.rect.height))
+        self.pos[0] = min(max(self.pos[0], 0), window.width - (self.rect.width))
+        self.pos[1] = min(max(self.pos[1], 0), window.height - (self.rect.height))
         
 
         ##IMPLEMENT SHOOTING

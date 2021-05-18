@@ -51,7 +51,7 @@ class Animation:
 
     # draw frame di pojok kiri atas
     def draw(self, window):
-        window.layar.blit(self.frames[self.__current_frame], (0,0))
+        window.display.blit(self.frames[self.__current_frame], (0,0))
 
     # draw frame di pos
     def draw(self, window, pos):
@@ -65,7 +65,7 @@ class Animation:
                 self.__current_frame = (self.__current_frame + 1)
                 self.last = now
 
-        window.layar.blit(self.frames[self.__current_frame], pos) 
+        window.display.blit(self.frames[self.__current_frame], pos) 
 
 
     def getcurFrame(self):
