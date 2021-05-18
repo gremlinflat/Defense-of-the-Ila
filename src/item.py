@@ -5,13 +5,14 @@ from random import uniform, randint
 
 BULLET_PATH = "bullet.png"
 BULLET_SCALE = (10, 20)
+BULLET_SPEED = 300
 class Bullet(Entity):
     def __init__(self, pos):
         super().__init__()
         self.pos = pos
         self._addAnimation(Animation(BULLET_PATH, 1, False))
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
-        self.speed = 200
+        self.speed = BULLET_SPEED
         self.vec = [0, -1]
         self.scale(BULLET_SCALE)
 
@@ -43,7 +44,7 @@ class Asteroid(Entity):
         self.rect.topleft = tuple(self.pos)
 
 BONUS_SCALE = (30, 30)
-BULLET_SPEED = 160
+
 class Bonus(Entity):
     def __init__(self, pos):
         super().__init__()
@@ -51,7 +52,7 @@ class Bonus(Entity):
         self._addAnimation(Animation(BONUS_PATH, 1, False))
         self.scale(BONUS_SCALE)
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
-        self.speed = BULLET_SPEED
+        self.speed = 60
         x = uniform(-0.5, 0.5)
         self.vec = [x, 1]
 
