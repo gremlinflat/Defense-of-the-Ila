@@ -33,7 +33,7 @@ class Asteroid(Entity):
         self.scale(scale)
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
         self.speed = randint(100, 300)
-        x = uniform(0.1, 0.5) if self.pos[0] < 400 else uniform(-0.5, -0.1)
+        x = uniform(-0.3, 0.7) if self.pos[0] < 400 else uniform(-0.7, 0.3)
         self.vec = [x, 1]
         
         
