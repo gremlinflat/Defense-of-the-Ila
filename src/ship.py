@@ -42,15 +42,20 @@ class Ship(Entity):
             Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sright"], 4, True),
             Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["right"], 4, True)
         ])
-        self.rect = pygame.Rect(pos, self.animations[0].frame_size)
+        self.rect = pygame.Rect(start_pos, self.animations[0].frame_size)
 
-        self.pos = list(self.rect.center)
+        self.pos = list(self.rect.topleft)
         self.speed = float(speed)
+        
         
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0)
         self.bullet_list = []
         self.health = 3 
+        self.start_pos = list(pos)
+
+    def reset_pos(self):
+        self.pos = self.start_pos
 
     def upgrade_ship(self):
         if self.current_ship + 1 >= len(SHIP_ANIMATIONS_PATH):
@@ -100,6 +105,7 @@ class Ship(Entity):
         self.rect.topleft = tuple(self.pos)
 
     def damage(self):
+        self.pos = [400, 600]
         self.health -= 1
 
     def isDestroyed(self):
