@@ -466,6 +466,7 @@ class Game:
         self.vfxs = []
         self.score = 0
         self.asteroid_shooted = 0
+        self.bonus_taken = 0
         self.play = True
 
         while self.play:
