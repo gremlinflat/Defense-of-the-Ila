@@ -248,6 +248,8 @@ class Game:
         self.bonus_timer = 0
         self.spawn_delay = 0
         self.shoot_delay = 0
+        self.score = 0
+        self.bonus_taken = 0
         self.return_btn = Write(
             center_position=(140, 570),
             font_size=15,
@@ -258,9 +260,7 @@ class Game:
         self.Menu = menu((self.window.width, self.window.height), self.window)
         self.game_state = GameState.TITLE
         #self.mouse_up = False
-        self.score = 0
         self.heart = Heart()
-        self.bonus_taken = 0
         self.shot_sfx = pygame.mixer.Sound(
             os.path.join(BASE_ASSET_PATH, SHOT_SOUND))
         self.dead_sfx = pygame.mixer.Sound(
@@ -469,9 +469,11 @@ class Game:
         self.ship = Ship((400, 600), 150, 4, 1)
         self.asteroids = []
         self.bullets = []
-        self.Bonuses = []
+        self.bonuses = []
         self.vfxs = []
+        self.shoot_delay = 0
         self.score = 0
+        self.bonus_taken = 0
         self.asteroid_shooted = 0
         self.play = True
 
