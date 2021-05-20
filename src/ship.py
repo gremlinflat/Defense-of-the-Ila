@@ -12,21 +12,19 @@ KEY_DICT = {
 }
 
 
-
-
 SHIP_ANIMATIONS_PATH = [{
-    "idle" : "ship/ship_normal_level1.png",
-    "left" : "ship/ship_left_level1.png",
+    "idle": "ship/ship_normal_level1.png",
+    "left": "ship/ship_left_level1.png",
     "right": "ship/ship_right_level1.png",
-    "sleft" : "ship/ship_sleft_level1.png",
+    "sleft": "ship/ship_sleft_level1.png",
     "sright": "ship/ship_sright_level1.png",
-    
+
 },
-{
-    "idle" : "ship/ship_normal_level2.png",
-    "left" : "ship/ship_left_level2.png",
+    {
+    "idle": "ship/ship_normal_level2.png",
+    "left": "ship/ship_left_level2.png",
     "right": "ship/ship_right_level2.png",
-    "sleft" : "ship/ship_sleft_level2.png",
+    "sleft": "ship/ship_sleft_level2.png",
     "sright": "ship/ship_sright_level2.png",
 }]
 
@@ -36,41 +34,49 @@ class Ship(Entity):
         super().__init__()
         self.current_ship = 0
         self._addAnimation([
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["left"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sleft"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["idle"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sright"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["right"], 4, True)
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["left"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["sleft"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["idle"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["sright"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["right"], 4, True)
         ])
         self.start_pos = [pos[0], pos[1] - self.animations[0].frame_size[1]]
-        self.rect = pygame.Rect([pos[0], pos[1] - self.animations[0].frame_size[1]], self.animations[0].frame_size)
+        self.rect = pygame.Rect(
+            [pos[0], pos[1] - self.animations[0].frame_size[1]], self.animations[0].frame_size)
 
         self.pos = list(self.rect.topleft)
         self.speed = float(speed)
-        
-        
+
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0)
         self.bullet_list = []
-        self.health = 3 
-        
+        self.health = 3
 
     def reset_pos(self):
         print(self.start_pos)
         self.pos = [self.start_pos[0], self.start_pos[1]]
 
-
     def upgrade_ship(self):
         if self.current_ship + 1 >= len(SHIP_ANIMATIONS_PATH):
             return
         self.current_ship += 1
-        
+
         new_animations = [
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["left"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sleft"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["idle"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sright"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["right"], 4, True)
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["left"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["sleft"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["idle"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["sright"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["right"], 4, True)
         ]
         self.animations = new_animations
 
@@ -78,13 +84,15 @@ class Ship(Entity):
         keys = pygame.key.get_pressed()
         self.move(keys, dt)
 
-        self.pos[0] = min(max(self.pos[0], 0), window.width - (self.rect.width))
-        self.pos[1] = min(max(self.pos[1], 0), window.height - (self.rect.height))
-        
+        self.pos[0] = min(max(self.pos[0], 0),
+                          window.width - (self.rect.width))
+        self.pos[1] = min(max(self.pos[1], 0),
+                          window.height - (self.rect.height))
 
-        ##IMPLEMENT SHOOTING
-    
+        # IMPLEMENT SHOOTING
+
     # methon pergerakan pesawat
+
     def move(self, keys, dt):
         notPressed = True
         for key in KEY_DICT:  # untuk setiap key di KEY_DECT
@@ -92,25 +100,24 @@ class Ship(Entity):
                 notPressed = False
                 self.vec = KEY_DICT[key]
                 self.pos[1] += self.vec[1] * self.speed * dt
-                self.pos[1] %= WIN_SIZE[1]
+                self.pos[1] %= (WIN_SIZE[1] - 50)
                 self.pos[0] += self.vec[0] * self.speed * dt
-                self.pos[0] %= WIN_SIZE[0]
+                self.pos[0] %= (WIN_SIZE[0] - 100)
         if notPressed:  # kondisi jika w, a, s, d tidak di tekan
             self.vec = (0, 0)
-        
+
         if self.vec[0] > 0:
             self._setnextAnim(4)
         elif self.vec[0] < 0:
             self._setnextAnim(0)
         else:
             self._setnextAnim(2)
-        
+
         self.rect.topleft = tuple(self.pos)
+        print(self.pos)
 
     def damage(self):
         self.health -= 1
 
     def isDestroyed(self):
         return self.health <= 0
-
-    
