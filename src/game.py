@@ -466,7 +466,7 @@ class Game:
         pygame.mixer.Sound.play(self.explosion_sfx)
 
     def start_game(self, clock):
-        self.ship = Ship((400, 600), 150, 4, 1)
+        self.ship = Ship((400, 600), 150)
         self.asteroids = []
         self.bullets = []
         self.bonuses = []

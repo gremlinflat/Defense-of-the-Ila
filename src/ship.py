@@ -32,7 +32,7 @@ SHIP_ANIMATIONS_PATH = [{
 
 
 class Ship(Entity):
-    def __init__(self, pos, speed, kolom, baris):
+    def __init__(self, pos, speed):
         super().__init__()
         self.current_ship = 0
         self._addAnimation([
@@ -51,7 +51,7 @@ class Ship(Entity):
         
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0)
-        self.bullet_list = []
+        # self.bullet_list = []
         self.health = 3 
         
 
@@ -95,7 +95,6 @@ class Ship(Entity):
         self.pos[1] = min(max(self.pos[1], 0), window.height - (self.rect.height))
         
 
-        ##IMPLEMENT SHOOTING
     
     # methon pergerakan pesawat
     def move(self, keys, dt):
@@ -105,9 +104,9 @@ class Ship(Entity):
                 notPressed = False
                 self.vec = KEY_DICT[key]
                 self.pos[1] += self.vec[1] * self.speed * dt
-                self.pos[1] %= WIN_SIZE[1]
+                #self.pos[1] %= WIN_SIZE[1]
                 self.pos[0] += self.vec[0] * self.speed * dt
-                self.pos[0] %= WIN_SIZE[0]
+                #self.pos[0] %= WIN_SIZE[0]
         if notPressed:  # kondisi jika w, a, s, d tidak di tekan
             self.vec = (0, 0)
         

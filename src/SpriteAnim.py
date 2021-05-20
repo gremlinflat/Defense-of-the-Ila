@@ -4,7 +4,7 @@ import os
 BASE_PATH = os.path.dirname(__file__)
 BASE_ASSET_PATH = os.path.join(BASE_PATH, os.pardir, "assets")
 
-DELAY_ANTARA_FRAME = 100
+DRAW_COOLDOWN = 100
 class Animation:
     def __init__(self, img_name, frame_count, loop):
         # ambil alamat directory (absolute)
@@ -17,7 +17,7 @@ class Animation:
 
         self.loop = loop
 
-        self.cooldown = DELAY_ANTARA_FRAME
+        self.cooldown = DRAW_COOLDOWN
         self.frame_count = frame_count
         self.last = pygame.time.get_ticks()
         # list frame yang dapat dari spritesheet
@@ -35,8 +35,9 @@ class Animation:
 
     def scale(self, size):
         new_frames = []
+        self.frame_size = size
         for frame in self.frames:
-            self.frame_size = size
+            
             new_frame = pygame.transform.scale(frame, size)
             new_frames.append(new_frame)
         self.frames = new_frames
@@ -67,7 +68,7 @@ class Animation:
 
         window.display.blit(self.frames[self.__current_frame], pos) 
 
-
+    ## APUS
     def getcurFrame(self):
         return self.__current_frame  
     
