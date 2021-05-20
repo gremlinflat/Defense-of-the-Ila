@@ -391,7 +391,7 @@ class Game:
         self.window.update()
     # mendapatkan jarak waktu antara dua frame dalam satuan detik
 
-    def delta_time(self, time_between):
+    def mili_to_second(self, time_between):
         return time_between / 1000.0
 
     def get_bonus(self):
@@ -461,7 +461,7 @@ class Game:
 
             self.draw()
             #print(self.vfxs)
-            self.__dt = self.delta_time(clock.tick(FPS))
+            self.__dt = self.mili_to_second(clock.tick(FPS))
 
         if self.ship.isDestroyed():
             pygame.mixer.Sound.play(self.dead_sfx)

@@ -42,7 +42,8 @@ class Ship(Entity):
             Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sright"], 4, True),
             Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["right"], 4, True)
         ])
-        self.rect = pygame.Rect(start_pos, self.animations[0].frame_size)
+        self.start_pos = list(pos)
+        self.rect = pygame.Rect(self.start_pos, self.animations[0].frame_size)
 
         self.pos = list(self.rect.topleft)
         self.speed = float(speed)
@@ -52,7 +53,7 @@ class Ship(Entity):
         self.vec = (0.0, 0.0)
         self.bullet_list = []
         self.health = 3 
-        self.start_pos = list(pos)
+        
 
     def reset_pos(self):
         self.pos = self.start_pos
