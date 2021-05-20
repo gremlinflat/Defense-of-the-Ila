@@ -54,8 +54,7 @@ class Ship(Entity):
 
         # (vec[0], vec[1]) == (x, y)
         self.vec = (0.0, 0.0)
-        self.health = 3 
-        
+        self.health = 3
 
     def reset_pos(self):
         print(self.start_pos)
@@ -85,11 +84,16 @@ class Ship(Entity):
         self.current_ship = 0
 
         new_animations = [
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["left"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sleft"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["idle"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sright"], 4, True),
-            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["right"], 4, True)
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["left"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["sleft"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["idle"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["sright"], 4, True),
+            Animation(
+                SHIP_ANIMATIONS_PATH[self.current_ship]["right"], 4, True)
         ]
         self.animations = new_animations
 
@@ -97,12 +101,9 @@ class Ship(Entity):
         keys = pygame.key.get_pressed()
         self.move(keys, dt)
 
-        self.pos[0] = min(max(self.pos[0], 0),
-                          window.width - (self.rect.width))
         self.pos[1] = min(max(self.pos[1], 0),
                           window.height - (self.rect.height))
 
-    
     # methon pergerakan pesawat
 
     def move(self, keys, dt):
@@ -112,9 +113,12 @@ class Ship(Entity):
                 notPressed = False
                 self.vec = KEY_DICT[key]
                 self.pos[1] += self.vec[1] * self.speed * dt
-                self.pos[1] %= (WIN_SIZE[1] - 50)
                 self.pos[0] += self.vec[0] * self.speed * dt
-                self.pos[0] %= (WIN_SIZE[0] - 100)
+                if self.pos[0] < (-0.5*self.rect.width):
+                    self.pos[0] = (WIN_SIZE[0] - (0.5*self.rect.width))
+                elif self.pos[0] > WIN_SIZE[0]-(0.5*self.rect.width):
+                    self.pos[0] = (-0.5*self.rect.width)
+
         if notPressed:  # kondisi jika w, a, s, d tidak di tekan
             self.vec = (0, 0)
 
