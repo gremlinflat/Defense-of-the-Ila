@@ -351,6 +351,7 @@ class Game:
         for asteroid in self.asteroids:
             if pygame.sprite.collide_rect(asteroid, self.ship):
                 self.ship.damage()
+                self.ship.reset_pos()
                 self.create_explosions(asteroid.pos, asteroid.animations[0].frame_size)
                 self.asteroids.remove(asteroid)
             asteroid.update(self.__dt)
@@ -462,6 +463,7 @@ class Game:
         self.asteroids = []
         self.bullets = []
         self.Bonuses = []
+        self.vfxs = []
         self.score = 0
         self.asteroid_shooted = 0
         self.play = True
