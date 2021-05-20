@@ -12,25 +12,26 @@ from SpriteAnim import BASE_ASSET_PATH, BASE_PATH
 
 PARALLAX_BG_PATH_FROM_ASSET = "bg2.jpg"
 MENU_IMAGE_PATH = "menu logo clear.png"
-CREDIT_IMAGE_PATH = "credit-pop up.jpg"
+CREDIT_IMAGE_PATH = "credit-pop up.png"
 GAMEOVER_IMAGE_PATH = "game over1.png"
 HEALTH_IMAGE_PATH = "health-bar 1.png"
 MENU_FONT_PATH = "Vermin Vibes 1989.ttf"
 SCORE_FONT_PATH = "Minecraft.ttf"
-SHOT_SOUND =  "laser2.mp3"
+SHOT_SOUND = "laser2.mp3"
 BACKGROUND_SOUND = "Background Menu Sound.mp3"
 BONUS_SOUND = "item bonus sound.mp3"
 DEAD_SOUND = "death.mp3"
 EXPLOSION_SOUND = "explosion_sound.mp3"
 FPS = 60
-#class layar
+# class layar
+
 
 class Window:
     def __init__(self, window_size):
         # inisialisasi pygame
         pygame.init()
         pygame.mixer.init()
-        
+
         self.width = window_size[0]
         self.height = window_size[1]
         # membuat object layar dengan sebesar {window_size}
@@ -38,7 +39,6 @@ class Window:
 
         self.bgimage = pygame.image.load(os.path.join(
             BASE_ASSET_PATH, PARALLAX_BG_PATH_FROM_ASSET))
-
 
         self.rectBGimg = self.bgimage.get_rect()
 
@@ -65,7 +65,7 @@ class Window:
 
 class menu():
     def __init__(self, window_size, window):
-        
+
         self.gambar = pygame.image.load(
             os.path.join(BASE_ASSET_PATH, MENU_IMAGE_PATH))
         self.credit_image = pygame.image.load(
@@ -108,7 +108,7 @@ class menu():
 
     def title_screen(self):
         self.buttons = [self.start_btn, self.credit_btn, self.quit_btn]
-        
+
         while True:
             mouse_up = False
             for event in pygame.event.get():
@@ -234,9 +234,12 @@ class Game:
     def __init__(self, window):
         self.__dt = 0
         self.window = window
-        self.bg_sfx = pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH,BACKGROUND_SOUND))
-        self.bonus_sfx = pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH,BONUS_SOUND))
-        self.explosion_sfx = pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH,EXPLOSION_SOUND))
+        self.bg_sfx = pygame.mixer.Sound(
+            os.path.join(BASE_ASSET_PATH, BACKGROUND_SOUND))
+        self.bonus_sfx = pygame.mixer.Sound(
+            os.path.join(BASE_ASSET_PATH, BONUS_SOUND))
+        self.explosion_sfx = pygame.mixer.Sound(
+            os.path.join(BASE_ASSET_PATH, EXPLOSION_SOUND))
         #self.ship = None
         self.asteroids = []
         self.bullets = []
@@ -258,8 +261,10 @@ class Game:
         self.score = 0
         self.heart = Heart()
         self.bonus_taken = 0
-        self.shot_sfx= pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH, SHOT_SOUND))
-        self.dead_sfx= pygame.mixer.Sound(os.path.join(BASE_ASSET_PATH, DEAD_SOUND))
+        self.shot_sfx = pygame.mixer.Sound(
+            os.path.join(BASE_ASSET_PATH, SHOT_SOUND))
+        self.dead_sfx = pygame.mixer.Sound(
+            os.path.join(BASE_ASSET_PATH, DEAD_SOUND))
 
     def show_score(self, window):
         font = pygame.font.Font(os.path.join(
@@ -281,10 +286,10 @@ class Game:
             if self.game_state == GameState.TITLE:
                 pygame.mixer.Sound.play(self.bg_sfx)
                 self.game_state = self.Menu.title_screen()
-            
+
             if self.game_state == GameState.NEWGAME:
                 pygame.mixer.Sound.stop(self.bg_sfx)
-                self.game_state = self.start_game(clock)               
+                self.game_state = self.start_game(clock)
 
             if self.game_state == GameState.credit:
                 self.game_state = self.Menu.credit_screen()
@@ -352,7 +357,8 @@ class Game:
             if pygame.sprite.collide_rect(asteroid, self.ship):
                 self.ship.damage()
                 self.ship.reset_pos()
-                self.create_explosions(asteroid.pos, asteroid.animations[0].frame_size)
+                self.create_explosions(
+                    asteroid.pos, asteroid.animations[0].frame_size)
                 self.asteroids.remove(asteroid)
             asteroid.update(self.__dt)
 
@@ -365,7 +371,8 @@ class Game:
                 if pygame.sprite.collide_rect(bullet, asteroid):
                     self.asteroids.remove(asteroid)
                     self.bullets.remove(bullet)
-                    self.create_explosions(asteroid.pos, asteroid.animations[0].frame_size)
+                    self.create_explosions(
+                        asteroid.pos, asteroid.animations[0].frame_size)
                     self.score += 1 if asteroid.rect.width <= 80 else 5
                     self.asteroid_shooted += 1
                     if self.asteroid_shooted >= 5:
@@ -450,14 +457,14 @@ class Game:
         y = pos[1]
         new_bonus = Bonus([x, y])
         self.Bonuses.append(new_bonus)
-    
+
     def create_explosions(self, pos, scale):
         x = pos[0]
         y = pos[1]
         new_explosions = Explosions_vfx([x, y], scale)
         self.vfxs.append(new_explosions)
         pygame.mixer.Sound.play(self.explosion_sfx)
-        
+
     def start_game(self, clock):
         self.ship = Ship((400, 600), 150, 4, 1)
         self.asteroids = []
@@ -473,7 +480,7 @@ class Game:
             self.update()
 
             self.draw()
-            #print(self.vfxs)
+            # print(self.vfxs)
             self.__dt = self.mili_to_second(clock.tick(FPS))
 
         if self.ship.isDestroyed():
