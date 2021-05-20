@@ -314,7 +314,7 @@ class Game:
             # pygame.mixer.Sound.play(self.window.shot)
             bullet.draw(self.window)
 
-        for bonus in self.Bonuses:
+        for bonus in self.bonuses:
             bonus.draw(self.window)
 
         for vfx in self.vfxs:
@@ -381,9 +381,9 @@ class Game:
 
             bullet.update(self.__dt)
 
-        for bonus in self.Bonuses:
+        for bonus in self.bonuses:
             if pygame.sprite.collide_rect(bonus, self.ship):
-                self.Bonuses.remove(bonus)
+                self.bonuses.remove(bonus)
                 self.get_bonus()
                 self.bonus_taken += 1
                 if self.bonus_taken % 10 == 0:
@@ -456,7 +456,7 @@ class Game:
         x = pos[0]
         y = pos[1]
         new_bonus = Bonus([x, y])
-        self.Bonuses.append(new_bonus)
+        self.bonuses.append(new_bonus)
 
     def create_explosions(self, pos, scale):
         x = pos[0]

@@ -57,6 +57,7 @@ class Ship(Entity):
 
     def reset_pos(self):
         print(self.start_pos)
+        self.reset_ship()
         self.pos = [self.start_pos[0], self.start_pos[1]]
 
 
@@ -65,6 +66,18 @@ class Ship(Entity):
             return
         self.current_ship += 1
         
+        new_animations = [
+            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["left"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sleft"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["idle"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sright"], 4, True),
+            Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["right"], 4, True)
+        ]
+        self.animations = new_animations
+
+    def reset_ship(self):
+        self.current_ship = 0
+
         new_animations = [
             Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["left"], 4, True),
             Animation(SHIP_ANIMATIONS_PATH[self.current_ship]["sleft"], 4, True),
