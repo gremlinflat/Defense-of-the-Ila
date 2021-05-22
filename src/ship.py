@@ -130,7 +130,7 @@ class Ship(Entity):
             self._setnextAnim(2)
 
         self.rect.topleft = tuple(self.pos)
-        print(self.pos)
+        #print(self.pos)
 
     def damage(self):
         self.health -= 1

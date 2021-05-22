@@ -360,6 +360,7 @@ class Game:
                 self.create_explosions(
                     asteroid.pos, asteroid.animations[0].frame_size)
                 self.asteroids.remove(asteroid)
+                continue
             asteroid.update(self.__dt)
 
         for bullet in self.bullets:

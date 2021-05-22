@@ -7,7 +7,6 @@ BASE_ASSET_PATH = os.path.join(BASE_PATH, os.pardir, "assets")
 DRAW_COOLDOWN = 100
 class Animation:
     def __init__(self, img_name, frame_count, loop):
-        # ambil alamat directory (absolute)
 
         # ambil spritesheet dari folder assets
         self.sheet = pygame.image.load(os.path.join(BASE_ASSET_PATH, img_name)).convert_alpha()
@@ -37,10 +36,10 @@ class Animation:
         new_frames = []
         self.frame_size = size
         for frame in self.frames:
-            
             new_frame = pygame.transform.scale(frame, size)
             new_frames.append(new_frame)
         self.frames = new_frames
+    
     # ganti frame yang di draw menjadi frame selanjutnya
     def next(self):
         self.__current_frame = ((self.__current_frame + 1) % (len(self.frames) - 1))

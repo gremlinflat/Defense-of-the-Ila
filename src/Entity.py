@@ -1,8 +1,8 @@
 import pygame 
 
-class Entity(pygame.sprite.Sprite):
+class Entity():
     def __init__(self):
-        super().__init__()
+        #super().__init__()
         self.animations = []
         self.next_animation = 0
         self.selected_animation = 0
