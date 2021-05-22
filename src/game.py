@@ -1,7 +1,7 @@
 import pygame
 import os
 from ship import Ship
-from item import Bonus, Asteroid, Bullet, BULLET_SCALE, Heart, Explosions_vfx
+from item import Bonus, Asteroid, Bullet, BULLET_SCALE, Heart, ExplosionsVfx
 from random import randint
 import pygame.freetype
 from pygame.sprite import Sprite
@@ -37,36 +37,36 @@ class Window:
         # membuat object layar dengan sebesar {window_size}
         self.display = pygame.display.set_mode(window_size)
 
-        self.bgimage = pygame.image.load(os.path.join(
+        self.bg_image = pygame.image.load(os.path.join(
             BASE_ASSET_PATH, PARALLAX_BG_PATH_FROM_ASSET))
 
-        self.rectBGimg = self.bgimage.get_rect()
+        self.rect_bg_image = self.bg_image.get_rect()
 
-        self.bgY1 = 0
-        self.bgX1 = 0
+        self.bg_Y1 = 0
+        self.bg_X1 = 0
 
-        self.bgY2 = -self.rectBGimg.height
-        self.bgX2 = 0
+        self.bg_Y2 = -self.rect_bg_image.height
+        self.bg_X2 = 0
 
         self.speed = 2
 
     def update(self):
-        self.bgY1 += self.speed
-        self.bgY2 += self.speed
-        if self.bgY1 >= self.rectBGimg.height:
-            self.bgY1 = -self.rectBGimg.height
-        if self.bgY2 >= self.rectBGimg.height:
-            self.bgY2 = -self.rectBGimg.height
+        self.bg_Y1 += self.speed
+        self.bg_Y2 += self.speed
+        if self.bg_Y1 >= self.rect_bg_image.height:
+            self.bg_Y1 = -self.rect_bg_image.height
+        if self.bg_Y2 >= self.rect_bg_image.height:
+            self.bg_Y2 = -self.rect_bg_image.height
 
     def draw(self):
-        self.display.blit(self.bgimage, (self.bgX2, self.bgY2))
-        self.display.blit(self.bgimage, (self.bgX1, self.bgY1))
+        self.display.blit(self.bg_image, (self.bg_X2, self.bg_Y2))
+        self.display.blit(self.bg_image, (self.bg_X1, self.bg_Y1))
 
 
-class menu():
+class Menu():
     def __init__(self, window_size, window):
 
-        self.gambar = pygame.image.load(
+        self.title_image = pygame.image.load(
             os.path.join(BASE_ASSET_PATH, MENU_IMAGE_PATH))
         self.credit_image = pygame.image.load(
             os.path.join(BASE_ASSET_PATH, CREDIT_IMAGE_PATH))
@@ -87,7 +87,7 @@ class menu():
             font_size=45,
             text_rgb=(255, 255, 0),
             text="CREDIT",
-            action=GameState.credit,
+            action=GameState.CREDIT,
         )
 
         self.quit_btn = Write(
@@ -114,7 +114,7 @@ class menu():
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                     mouse_up = True
-            self.window.display.blit(self.gambar, (0, 0))
+            self.window.display.blit(self.title_image, (0, 0))
 
             for button in self.buttons:
                 self.ui_action = button.update(
@@ -162,29 +162,24 @@ class menu():
 
 class Write(Sprite):
     def __init__(self, center_position, text, font_size, text_rgb, action=None):
-        self.mouse_over = False  # indicates if the mouse is over the element
+        super().__init__()
+        self.mouse_over = False  
 
-        # create the default image
         default_image = create_surface_with_text(
             text=text, font_size=font_size, text_rgb=text_rgb
         )
 
-        # create the image that shows when mouse is over the element
         highlighted_image = create_surface_with_text(
             text=text, font_size=font_size * 1.2, text_rgb=(128, 0, 0)
         )
 
-        # add both images and their rects to lists
         self.images = [default_image, highlighted_image]
         self.rects = [
             default_image.get_rect(center=center_position),
             highlighted_image.get_rect(center=center_position),
         ]
         self.action = action
-        # calls the init method of the parent sprite class
-        super().__init__()
 
-        # properties that vary the image and its rect when the mouse is over the element
     @property
     def image(self):
         return self.images[1] if self.mouse_over else self.images[0]
@@ -194,9 +189,6 @@ class Write(Sprite):
         return self.rects[1] if self.mouse_over else self.rects[0]
 
     def update(self, mouse_pos, mouse_up):
-        """ Updates the element's appearance depending on the mouse position
-            and returns the button's action if clicked.
-        """
         if self.rect.collidepoint(mouse_pos):
             self.mouse_over = True
             if mouse_up:
@@ -213,12 +205,11 @@ class GameState(Enum):
     QUIT = -1
     TITLE = 0
     NEWGAME = 1
-    credit = 2
+    CREDIT = 2
     GAMEOVER = -2
 
 
 def create_surface_with_text(text, font_size, text_rgb):
-    """ Returns surface with text written on """
     font = pygame.font.Font(os.path.join(
         BASE_ASSET_PATH, MENU_FONT_PATH), int(font_size))
     surface = font.render(text, True, text_rgb)
@@ -257,7 +248,7 @@ class Game:
             text="Return to main menu",
             action=GameState.TITLE,
         )
-        self.Menu = menu((self.window.width, self.window.height), self.window)
+        self.menu = Menu((self.window.width, self.window.height), self.window)
         self.game_state = GameState.TITLE
         #self.mouse_up = False
         self.heart = Heart()
@@ -285,17 +276,17 @@ class Game:
 
             if self.game_state == GameState.TITLE:
                 pygame.mixer.Sound.play(self.bg_sfx)
-                self.game_state = self.Menu.title_screen()
+                self.game_state = self.menu.title_screen()
 
             if self.game_state == GameState.NEWGAME:
                 pygame.mixer.Sound.stop(self.bg_sfx)
                 self.game_state = self.start_game(clock)
 
-            if self.game_state == GameState.credit:
-                self.game_state = self.Menu.credit_screen()
+            if self.game_state == GameState.CREDIT:
+                self.game_state = self.menu.credit_screen()
 
             if self.game_state == GameState.GAMEOVER:
-                self.game_state = self.Menu.gameover_screen()
+                self.game_state = self.menu.gameover_screen()
 
             if self.game_state == GameState.QUIT:
                 pygame.quit()
@@ -398,12 +389,12 @@ class Game:
         if self.ship != None:
             self.ship.update(self.window, self.__dt)
 
-        if self.ship.isDestroyed():
+        if self.ship.is_destroyed():
             self.play = False
 
-        self.Menu.ui_action = self.return_btn.update(
+        self.menu.ui_action = self.return_btn.update(
             pygame.mouse.get_pos(), mouse_up)
-        if self.Menu.ui_action:
+        if self.menu.ui_action:
             self.play = False
 
         self.window.update()
@@ -462,7 +453,7 @@ class Game:
     def create_explosions(self, pos, scale):
         x = pos[0]
         y = pos[1]
-        new_explosions = Explosions_vfx([x, y], scale)
+        new_explosions = ExplosionsVfx([x, y], scale)
         self.vfxs.append(new_explosions)
         pygame.mixer.Sound.play(self.explosion_sfx)
 
@@ -486,7 +477,7 @@ class Game:
             # print(self.vfxs)
             self.__dt = self.mili_to_second(clock.tick(FPS))
 
-        if self.ship.isDestroyed():
+        if self.ship.is_destroyed():
             pygame.mixer.Sound.play(self.dead_sfx)
             return GameState.GAMEOVER
         else:

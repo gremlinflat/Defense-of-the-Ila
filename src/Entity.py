@@ -28,14 +28,14 @@ class Entity():
     def update(self):
         pass
     
-    def _addAnimation(self, Animation):
+    def _add_animation(self, Animation):
         if type(Animation) is list:
             self.animations.extend(Animation)
         else:
             self.animations.append(Animation)
-    def _setnextAnim(self, idx):
+    def _set_next_anim(self, idx):
         self.next_animation = idx
-    def _setAnimation(self, idx):
+    def _set_animation(self, idx):
         self.selected_animation = idx
         self.next_animation = idx
 
