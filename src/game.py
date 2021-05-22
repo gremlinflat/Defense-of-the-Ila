@@ -1,7 +1,7 @@
 import pygame
 import os
 from ship import Ship
-from item import Bonus, Asteroid, Bullet, BULLET_SCALE, Heart, Explosions_vfx
+from item import Bonus, Asteroid, Bullet, BULLET_SCALE, Heart, ExplosionsVfx
 from random import randint
 import pygame.freetype
 from pygame.sprite import Sprite
@@ -452,7 +452,7 @@ class Game:
     def create_explosions(self, pos, scale):
         x = pos[0]
         y = pos[1]
-        new_explosions = Explosions_vfx([x, y], scale)
+        new_explosions = ExplosionsVfx([x, y], scale)
         self.vfxs.append(new_explosions)
         pygame.mixer.Sound.play(self.explosion_sfx)
 

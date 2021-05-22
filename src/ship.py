@@ -104,7 +104,7 @@ class Ship(Entity):
         self.pos[1] = min(max(self.pos[1], 0),
                           window.height - (self.rect.height))
 
-    # methon pergerakan pesawat
+    # method pergerakan pesawat
 
     def move(self, keys, dt):
         not_pressed = True
