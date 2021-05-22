@@ -69,7 +69,7 @@ class Animation:
         window.display.blit(self.frames[self.__current_frame], pos) 
 
     ## APUS
-    def getcurFrame(self):
+    def get_cur_frame(self):
         return self.__current_frame  
     
     

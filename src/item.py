@@ -10,7 +10,7 @@ class Bullet(Entity):
     def __init__(self, pos):
         super().__init__()
         self.pos = pos
-        self._addAnimation(Animation(BULLET_PATH, 1, False))
+        self._add_animation(Animation(BULLET_PATH, 1, False))
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
         self.speed = BULLET_SPEED
         self.vec = [0, -1]
@@ -29,7 +29,7 @@ class Asteroid(Entity):
     def __init__(self, pos, scale):
         super().__init__()
         self.pos = pos
-        self._addAnimation(Animation(ASTEROID_PATH, 1, False))
+        self._add_animation(Animation(ASTEROID_PATH, 1, False))
         self.scale(scale)
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
         self.speed = randint(100, 300)
@@ -49,7 +49,7 @@ class Bonus(Entity):
     def __init__(self, pos):
         super().__init__()
         self.pos = pos
-        self._addAnimation(Animation(BONUS_PATH, 1, False))
+        self._add_animation(Animation(BONUS_PATH, 1, False))
         self.scale(BONUS_SCALE)
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
         self.speed = 60
@@ -64,7 +64,7 @@ class Bonus(Entity):
 class Heart(Entity):
     def __init__(self):
         super().__init__()
-        self._addAnimation(Animation(HEART_PATH, 1, False))
+        self._add_animation(Animation(HEART_PATH, 1, False))
         self.scale(BONUS_SCALE)
         self.rect = pygame.Rect((0, 0), self.animations[0].frame_size)
     
@@ -72,7 +72,7 @@ class Explosions_vfx(Entity):
     def __init__(self, pos, scale):
         super().__init__()
         self.pos = pos
-        self._addAnimation(Animation(EXPLOSION_PATH, 4, False))
+        self._add_animation(Animation(EXPLOSION_PATH, 4, False))
         self.scale(scale)
         self.rect = pygame.Rect(pos, self.animations[0].frame_size)
     

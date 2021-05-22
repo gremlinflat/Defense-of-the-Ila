@@ -33,7 +33,7 @@ class Ship(Entity):
     def __init__(self, pos, speed):
         super().__init__()
         self.current_ship = 0
-        self._addAnimation([
+        self._add_animation([
             Animation(
                 SHIP_ANIMATIONS_PATH[self.current_ship]["left"], 4, True),
             Animation(
@@ -107,10 +107,10 @@ class Ship(Entity):
     # methon pergerakan pesawat
 
     def move(self, keys, dt):
-        notPressed = True
+        not_pressed = True
         for key in KEY_DICT:  # untuk setiap key di KEY_DECT
             if keys[key]:  # kondisi jika w, a, s, d di tekan
-                notPressed = False
+                not_pressed = False
                 self.vec = KEY_DICT[key]
                 self.pos[1] += self.vec[1] * self.speed * dt
                 self.pos[0] += self.vec[0] * self.speed * dt
@@ -119,15 +119,15 @@ class Ship(Entity):
                 elif self.pos[0] > WIN_SIZE[0]-(0.5*self.rect.width):
                     self.pos[0] = (-0.5*self.rect.width)
 
-        if notPressed:  # kondisi jika w, a, s, d tidak di tekan
+        if not_pressed:  # kondisi jika w, a, s, d tidak di tekan
             self.vec = (0, 0)
 
         if self.vec[0] > 0:
-            self._setnextAnim(4)
+            self._set_next_anim(4)
         elif self.vec[0] < 0:
-            self._setnextAnim(0)
+            self._set_next_anim(0)
         else:
-            self._setnextAnim(2)
+            self._set_next_anim(2)
 
         self.rect.topleft = tuple(self.pos)
         print(self.pos)
@@ -135,5 +135,5 @@ class Ship(Entity):
     def damage(self):
         self.health -= 1
 
-    def isDestroyed(self):
+    def is_destroyed(self):
         return self.health <= 0
